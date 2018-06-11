@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
  * 3. Count number of lines in a string (countLines)
  * 4. Read all contents from a txt file, with window to choose file (choosereadfile)
  * 5. Generate a random number from a given range (randomnumbergenerator)
+ * 6. Generate a random string of characters with the specified length (randomstring)
  * @author weiyifan
  *
  */
@@ -66,5 +67,18 @@ public class utility_toolkit {
 	public int randomnumbergenerator(int max, int min){
 		Random rand = new Random();
 		return rand.nextInt(max-min+1) + min;
+	}
+	
+	public String randomstring(int length){
+
+	    String CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+	    StringBuilder string = new StringBuilder();
+	    Random rand = new Random();
+	    while (string.length() < length) { // length of the random string.
+	        int index = rand.nextInt(CHAR.length());
+	        string.append(CHAR.charAt(index));
+	    }
+	    String result = string.toString();
+	    return result;
 	}
 }

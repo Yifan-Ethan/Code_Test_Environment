@@ -16,6 +16,7 @@ import java.util.List;
  * 1. Combinations calculator (ncr)
  * 2. Permutations without repetition for numerals (nprnorepeatnumeric)
  * 3. Number partitions, algorithm follows generating function (NumberPartitionGeneratingFunction)
+ * 4. Permutations calculator (npr)
  * 
  * Large calculations
  * 1. Sum of all integers in a list (sumlist)
@@ -172,7 +173,7 @@ public class math_toolkit {
 		return result;
 	}
 	
-	public BigInteger factorial(BigInteger n){
+	public static BigInteger factorial(BigInteger n){
 		BigInteger answer = BigInteger.ONE;
 		while(n.compareTo(BigInteger.ONE) == 1){
 			answer = answer.multiply(n);
@@ -333,5 +334,12 @@ public class math_toolkit {
 		}
 		
 		return products;
+	}
+	
+	public static BigInteger npr(int n, int r){
+		BigInteger nfactorial = (factorial(BigInteger.valueOf(n)));
+		BigInteger rfactorial = (factorial(BigInteger.valueOf(r)));
+		BigInteger nminusrfactorial = (factorial(BigInteger.valueOf(n-r)));
+		return nfactorial.divide(nminusrfactorial);
 	}
 }

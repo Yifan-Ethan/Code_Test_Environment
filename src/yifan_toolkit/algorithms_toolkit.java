@@ -38,6 +38,9 @@ import test_objects.object1;
  * 
  * Path Finding
  * 1. Given a specified distance, find all possible routes from start point to end point (numberofpaths)
+ * 
+ * Search Algorithms
+ * 1. Binary search (binarysearch)
  * @author weiyifan
  */
 
@@ -867,6 +870,23 @@ public class algorithms_toolkit {
 		//Once all new nodes have been updated with their possible paths, memoize current node and its paths, and return the list of found paths
 		memoize.addkeyvaluepair(currentnode.toString()+distance, subpaths);
 		return allpaths;
+	}
+	
+	public static boolean binarysearch(int n, List<Integer> l){
+		if(l.size()==1 && l.get(0)!=n){	//base case
+			return false;
+		}
+		else if(l.get(l.size()/2)==n){	//base case
+			return true;
+		}
+		else{
+			if(l.get(l.size()/2)<=n){
+				return binarysearch(n, l.subList(l.size()/2, l.size()));
+			}
+			else{
+				return binarysearch(n, l.subList(0, (l.size()/2)));
+			}
+		}
 	}
 	
 	//---------------------------------------------------------TEST ZONE-------------------------------------------------------------------------
