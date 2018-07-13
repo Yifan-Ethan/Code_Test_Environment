@@ -18,7 +18,7 @@ import java.util.List;
 
 public class problemspecific_solutions_toolkit {
 
-	static math_toolkit k1 = new math_toolkit();
+	static MathKit k1 = new MathKit();
 	
 	/**
 	 * Important: You need to write your own code to generate the set of coordinates for vertices within the function itself. 

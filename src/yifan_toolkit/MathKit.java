@@ -24,8 +24,9 @@ import java.util.List;
  * 3. Factorial (factorial)
  * 
  * Graphs
- * 1. Calculates 2 dimensional Euclidean distance (twodimensioneuclideandistance)
- * 2. Formulate the gradient and y-intercept of linear equation based on 2 points on graph (graphlinearequationmnc)
+ * 1. Calculates 2 dimensional Euclidean distance for big integer (BigIntTwoDEuclideanDist)
+ * 2. Calculates 2 dimensional Euclidean distance for double (DoubleTwoDEuclideanDist)
+ * 3. Formulate the gradient and y-intercept of linear equation based on 2 points on graph (graphlinearequationmnc)
  * 
  * Investigation of a number
  * 1. Checks if number is prime (isPrime)
@@ -39,8 +40,8 @@ import java.util.List;
  * 
  * @author weiyifan
  */
-public class math_toolkit {
-	public math_toolkit(){
+public class MathKit {
+	public MathKit(){
 	}
 	
 	/**
@@ -94,13 +95,25 @@ public class math_toolkit {
 	
 	//Please note that the inputs are x1, y1, x2 and y2
 	//Please refer to BigDecimalsqrt function to adjust precision of decimal places if code efficiency needs to be increased
-	public BigDecimal twodimensioneuclideandistance(BigInteger ax, BigInteger ay, BigInteger bx, BigInteger by){
+	//This function is specifically designed for big integers
+	public static BigDecimal BigIntTwoDEuclideanDist(BigInteger ax, BigInteger ay, BigInteger bx, BigInteger by){
 		BigInteger xdifference = ax.subtract(bx);
 		BigInteger ydifference = ay.subtract(by);
 		BigInteger xdistance = xdifference.pow(2);
 		BigInteger ydistance = ydifference.pow(2);
 		BigInteger distancetotal = xdistance.add(ydistance);
 		return BigDecimalsqrt(new BigDecimal(distancetotal));
+	}
+	
+	//Please note that the inputs are x1, y1, x2 and y2
+	//This function is specifically designed for doubles
+	public static double DoubleTwoDEuclideanDist(double ax, double ay, double bx, double by){
+		double xdifference = ax-bx;
+		double ydifference = ay-by;
+		double xdistance = Math.pow(xdifference, 2);
+		double ydistance = Math.pow(ydifference, 2);
+		double distancetotal = xdistance+ydistance;
+		return Math.sqrt(distancetotal);
 	}
 	
 	/**
@@ -322,7 +335,7 @@ public class math_toolkit {
 		products.add(BigInteger.ONE);
 		for(int r=1;r<=subdivisors.size();r++){		//Loop to generate all possible number of elements in combination of sub-divisors
 			@SuppressWarnings("unchecked")
-			List<List<BigInteger>> dump = algorithms_toolkit.combinationsnorepeat(r, subdivisors);	//dump is a list of combinations with a specified number of elements
+			List<List<BigInteger>> dump = AlgoKit.combinationsnorepeat(r, subdivisors);	//dump is a list of combinations with a specified number of elements
 			for(int i=0;i<dump.size();i++){
 				List<BigInteger> subdump = dump.get(i);			//subdump is a singular combination from dump
 				for(int isub=0;isub<subdump.size();isub++){		//calculate product from elements in subdump
@@ -338,7 +351,6 @@ public class math_toolkit {
 	
 	public static BigInteger npr(int n, int r){
 		BigInteger nfactorial = (factorial(BigInteger.valueOf(n)));
-		BigInteger rfactorial = (factorial(BigInteger.valueOf(r)));
 		BigInteger nminusrfactorial = (factorial(BigInteger.valueOf(n-r)));
 		return nfactorial.divide(nminusrfactorial);
 	}

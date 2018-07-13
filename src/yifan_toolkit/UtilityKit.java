@@ -23,25 +23,25 @@ import javax.swing.JFileChooser;
  * @author weiyifan
  *
  */
-public class utility_toolkit {
-	public utility_toolkit(){
+public class UtilityKit {
+	public UtilityKit(){
 	}
 	
-	public String readfile(String filename) throws FileNotFoundException{
+	public static String readfile(String filename) throws FileNotFoundException{
 		
 		Scanner entireFileText = new Scanner(new File(filename));
-		String content = "";
+		StringBuilder content = new StringBuilder();
 		
 		while(entireFileText.hasNextLine()){
-			content = content + entireFileText.nextLine() + "\n";
+			content.append(entireFileText.nextLine() + "\n");
 		}
 		
 		entireFileText.close();
-		return content;
+		return content.toString();
 	}
 	
 	//Due to issues on java 7, you might need to use  string.replaceAll("toreplace", "replaceto") to clear out as many unwanted symbols as possible before using delimiter;
-	public List<String> stringtolistbydelimiter (String content, String delimiter){
+	public static List<String> stringtolistbydelimiter (String content, String delimiter){
 		List<String> list = Arrays.asList(content.split(delimiter));
 		return list;
 	}
@@ -51,7 +51,7 @@ public class utility_toolkit {
 		   return  lines.length;
 	}
 	
-	public String choosereadfile() throws FileNotFoundException{
+	public static String choosereadfile() throws FileNotFoundException{
 		
 		String s = "";
 		JFileChooser jfc = new JFileChooser();
@@ -64,12 +64,12 @@ public class utility_toolkit {
 		return s;
 	}
 	
-	public int randomnumbergenerator(int max, int min){
+	public static int randomnumbergenerator(int max, int min){
 		Random rand = new Random();
 		return rand.nextInt(max-min+1) + min;
 	}
 	
-	public String randomstring(int length){
+	public static String randomstring(int length){
 
 	    String CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 	    StringBuilder string = new StringBuilder();

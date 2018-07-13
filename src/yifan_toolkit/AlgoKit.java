@@ -44,11 +44,11 @@ import test_objects.object1;
  * @author weiyifan
  */
 
-public class algorithms_toolkit {
+public class AlgoKit {
 	
 	//Fixed variables, DO NOT TOUCH THESE EXCEPT FOR DEBUGGING
-	static math_toolkit k1 = new math_toolkit();
-	static utility_toolkit k2 = new utility_toolkit();
+	static MathKit k1 = new MathKit();
+	static UtilityKit k2 = new UtilityKit();
 	static HashMap <BigInteger, BigInteger> memoizelist = new HashMap <BigInteger, BigInteger>();
 	@SuppressWarnings("rawtypes")
 	static HashMap <String, List> permutelist = new HashMap <String, List>();
@@ -56,7 +56,7 @@ public class algorithms_toolkit {
 	static HashMap <String, List> combilist = new HashMap <String, List>();
 	static memoize memoize = new memoize();
 	
-	public algorithms_toolkit(){
+	public AlgoKit(){
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class algorithms_toolkit {
 		//Advance the population based on the number of generations
 		for(int g = 0;g<generation;g++){
 			
-			piggies = Supportfunction.geneticalgorithmmergesort(piggies);	//Sort solutions in descending order		
+			piggies = SuppFunction.geneticalgorithmmergesort(piggies);	//Sort solutions in descending order		
 		
 			int mate = population/2;	//selects half of the strongest solutions
 		
@@ -102,7 +102,7 @@ public class algorithms_toolkit {
 			
 				for(int n = 0;n<2;n++){		//Each pair of parents give birth twice
 					//Child
-					int pivot = k2.randomnumbergenerator(l.size()-1, 0);
+					int pivot = UtilityKit.randomnumbergenerator(l.size()-1, 0);
 					List<object1> childpig = new ArrayList<object1>();
 			
 					//Inherit from first parent
@@ -116,8 +116,8 @@ public class algorithms_toolkit {
 					}
 			
 					//child mutation
-					int mutategeneindex1 = k2.randomnumbergenerator(childpig.size()-1, 0);
-					int mutategeneindex2 = k2.randomnumbergenerator(childpig.size()-1, 0);
+					int mutategeneindex1 = UtilityKit.randomnumbergenerator(childpig.size()-1, 0);
+					int mutategeneindex2 = UtilityKit.randomnumbergenerator(childpig.size()-1, 0);
 					object1 mutategene1 = childpig.get(mutategeneindex1);
 					object1 mutategene2 = childpig.get(mutategeneindex2);
 					childpig.set(mutategeneindex1, mutategene2);
@@ -158,7 +158,7 @@ public class algorithms_toolkit {
 		//Advance the population based on the number of generations
 		for(int g = 0;g<generation;g++){
 			
-			piggies = Supportfunction.geneticalgorithmmergesort(piggies);	//Sort solutions in descending order		
+			piggies = SuppFunction.geneticalgorithmmergesort(piggies);	//Sort solutions in descending order		
 		
 			int mate = population/2;	//selects half of the strongest solutions
 		
@@ -174,7 +174,7 @@ public class algorithms_toolkit {
 				List<object1> parentpig = ((List<object1>) ((ArrayList<object1>) piggies.get(parentindex)  ).clone());;
 			
 				//Child
-				int pivot = k2.randomnumbergenerator(l.size()-1, 0);
+				int pivot = UtilityKit.randomnumbergenerator(l.size()-1, 0);
 				List<object1> childpig = new ArrayList<object1>();
 			
 				//Inherit from parent
@@ -184,14 +184,14 @@ public class algorithms_toolkit {
 			
 				//Randomize the rest of parent genes, ONLY PORTION OF CODE DIFFERENT FROM DUAL PARENT GENETIC ALGORITHM
 				for(int k = pivot+1;k<l.size();k++){
-					int randomindex = k2.randomnumbergenerator(parentpig.size()-1, pivot+1);
+					int randomindex = UtilityKit.randomnumbergenerator(parentpig.size()-1, pivot+1);
 					childpig.add(parentpig.get(randomindex));
 					parentpig.remove(randomindex);
 				}
 			
 				//child mutation
-				int mutategeneindex1 = k2.randomnumbergenerator(childpig.size()-1, 0);
-				int mutategeneindex2 = k2.randomnumbergenerator(childpig.size()-1, 0);
+				int mutategeneindex1 = UtilityKit.randomnumbergenerator(childpig.size()-1, 0);
+				int mutategeneindex2 = UtilityKit.randomnumbergenerator(childpig.size()-1, 0);
 				object1 mutategene1 = childpig.get(mutategeneindex1);
 				object1 mutategene2 = childpig.get(mutategeneindex2);
 				childpig.set(mutategeneindex1, mutategene2);
@@ -332,7 +332,7 @@ public class algorithms_toolkit {
 		//Advance the population based on the number of generations
 		for(int g = 0;g<generation;g++){
 			
-			piggies = Supportfunction.geneticalgorithmmergesort(piggies);	//Sort solutions in descending order	
+			piggies = SuppFunction.geneticalgorithmmergesort(piggies);	//Sort solutions in descending order	
 			
 			int mate = population/2;	//selects half of the strongest solutions
 
@@ -347,7 +347,7 @@ public class algorithms_toolkit {
 				List<object1> parentpig = ((List<object1>) ((ArrayList<object1>) piggies.get(parentindex)).clone());
 				
 				//Child
-				int pivot = k2.randomnumbergenerator(e-1, 0);
+				int pivot = UtilityKit.randomnumbergenerator(e-1, 0);
 				List<object1> childpig = new ArrayList<object1>();
 				
 				//Inherit from parent
@@ -359,16 +359,16 @@ public class algorithms_toolkit {
 				Collections.shuffle(l);
 				List<object1> dump = ((List<object1>) ((ArrayList<object1>) l).clone());
 				for(int k = pivot+1;k<e;k++){
-					object1 birthgene = Supportfunction.identifyuniquegene(childpig,dump);
+					object1 birthgene = SuppFunction.identifyuniquegene(childpig,dump);
 					childpig.add(birthgene);
 				}
 
 				//child mutation 
 				for(int m=0;m<mutations;m++){
-					int mutategeneindex = k2.randomnumbergenerator(childpig.size()-1, 0);
+					int mutategeneindex = UtilityKit.randomnumbergenerator(childpig.size()-1, 0);
 					Collections.shuffle(dump);
-					if(Supportfunction.identifyuniquegene(childpig,dump) != null){		//Only assign the unique gene if it is not equals to null. Equals to null means that number of elements in combination = total number of elements in scope, which is a pointless computation
-						object1 mutategene = Supportfunction.identifyuniquegene(childpig,dump);
+					if(SuppFunction.identifyuniquegene(childpig,dump) != null){		//Only assign the unique gene if it is not equals to null. Equals to null means that number of elements in combination = total number of elements in scope, which is a pointless computation
+						object1 mutategene = SuppFunction.identifyuniquegene(childpig,dump);
 						childpig.set(mutategeneindex, mutategene);
 					}
 				}
@@ -391,7 +391,7 @@ public class algorithms_toolkit {
 		List<object1> bestsolution = new ArrayList<object1>();
 		for(int i = minrange; i<=maxrange;i++){
 			List<object1> newsolution = geneticalgorithmcombination(l, i);
-			if(Supportfunction.fitnessfunction(newsolution).compareTo(Supportfunction.fitnessfunction(bestsolution)) == 1){		//Set the new solution as best solution if it is better
+			if(SuppFunction.fitnessfunction(newsolution).compareTo(SuppFunction.fitnessfunction(bestsolution)) == 1){		//Set the new solution as best solution if it is better
 				bestsolution = ((List<object1>) ((ArrayList<object1>) newsolution).clone());
 			}
 		}
@@ -834,7 +834,7 @@ public class algorithms_toolkit {
 				List<node> newcandidatepath = ((List<node>) ((ArrayList<node>) candidatepath).clone());
 				newcandidatepath.add(nextnode);
 				
-				BigDecimal currenttonextpointdistance = k1.twodimensioneuclideandistance(nextnode.getX(), nextnode.getY(), currentnode.getX(), currentnode.getY());	//calculate distance between current point to next point
+				BigDecimal currenttonextpointdistance = MathKit.BigIntTwoDEuclideanDist(nextnode.getX(), nextnode.getY(), currentnode.getX(), currentnode.getY());	//calculate distance between current point to next point
 				BigDecimal leftoverdistance = distance.subtract(currenttonextpointdistance);	//updates the distance travelled up to new point
 				
 				int size = allpaths.size();

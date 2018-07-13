@@ -16,9 +16,9 @@ import test_objects.object1;
  * @author weiyifan
  *
  */
-public class Supportfunction {
+public class SuppFunction {
 	
-	public Supportfunction(){
+	public SuppFunction(){
 	}
 	
 	/**
