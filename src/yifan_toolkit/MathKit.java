@@ -276,6 +276,7 @@ public class MathKit {
 	/**
 	 * Calculates the perpendicular distance from edge with points (ax,ay) and (bx,by) to point (px,py)
 	 * Accuracy is used to decide whether absolute accuracy of answer should be kept. True to keep accuracy and false to ignore.
+	 * This function follows the formula of perpendicular dist: (Ax + By + C)/((A^2 + B^2)^(1/2))
 	 * @param ax
 	 * @param ay
 	 * @param bx
@@ -288,52 +289,60 @@ public class MathKit {
 	public static List<String> PerpendicularDistDouble(double ax, double ay, double bx, double by, double px, double py, boolean accuracy){
 		
 		List<List<Double>> mnc = MathKit.GraphLinearEquationMNCDouble(ax, ay, bx, by);
-		
-		//a is coefficient of x (numerator of gradient for now), b is coefficient of y, and c is y intercept (just the numerator for now)
-		double a = mnc.get(0).get(0);
-		double b = 1;
-		double c = mnc.get(1).get(0);
-		
-		//Align sign of a with that of gradient
-		if((a<0 && (mnc.get(0).get(0)/mnc.get(0).get(1))>0) ||
-		   (a>0 && (mnc.get(0).get(0)/mnc.get(0).get(1))<0)	){
-			a = -a;
-		}
-		
-		//Align sign of c with that of y intercept
-		if((c<0 && (mnc.get(1).get(0)/mnc.get(1).get(1))>0) ||
-		   (c>0 && (mnc.get(1).get(0)/mnc.get(1).get(1))<0)	){
-			c = -c;
-		}
-		
-		//Multiply each coefficient by all available denominators to eliminate fractions
-		a = a*Math.abs(mnc.get(1).get(1));
-		b = b*Math.abs(mnc.get(1).get(1))*Math.abs(mnc.get(0).get(1));
-		c = c*Math.abs(mnc.get(0).get(1));
-		
-		//Bring x and c to the side of y so equation becomes AX+BY+C=0
-		a = -a;
-		c = -c;
-		
-		//Numerator of perpendicular distance
-		double numerator = (a*px) + (b*py) + c;
-		
-		//Return depends on whether user wants to keep accuracy of answer
-		//If accuracy is true, function will return a list with 2 items. Index 0 is the numerator. Index 1 is the denominator, whose value have yet to be square rooted
-		//If accuracy is false, function will return a list with 1 item. Index 0 contains the numerical distance in string format.
-		if(accuracy){
+
+		//If edge is vertical, and hence has no gradient or y intercept values
+		if(mnc.get(0).get(1)==0){
 			List<String> answer = new ArrayList<String>();
-			answer.add(String.valueOf(numerator));
-			double denominator = Math.pow(a, 2)+Math.pow(b, 2);
-			answer.add("Square root of "+String.valueOf(denominator));
+			answer.add(String.valueOf(Math.abs(ax-px)));
 			return answer;
 		}
 		else{
-			//Denominator of perpendicular distance
-			double denominator = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2));
-			List<String> answer = new ArrayList<String>();
-			answer.add(String.valueOf(Math.abs(numerator/denominator)));
-			return answer;
+			//a is coefficient of x (numerator of gradient for now), b is coefficient of y, and c is y intercept (just the numerator for now)
+			double a = mnc.get(0).get(0);
+			double b = 1;
+			double c = mnc.get(1).get(0);
+			
+			//Align sign of a with that of gradient
+			if((a<0 && (mnc.get(0).get(0)/mnc.get(0).get(1))>0) ||
+			   (a>0 && (mnc.get(0).get(0)/mnc.get(0).get(1))<0)	){
+				a = -a;
+			}
+			
+			//Align sign of c with that of y intercept
+			if((c<0 && (mnc.get(1).get(0)/mnc.get(1).get(1))>0) ||
+			   (c>0 && (mnc.get(1).get(0)/mnc.get(1).get(1))<0)	){
+				c = -c;
+			}
+			
+			//Multiply each coefficient by all available denominators to eliminate fractions
+			a = a*Math.abs(mnc.get(1).get(1));
+			b = b*Math.abs(mnc.get(1).get(1))*Math.abs(mnc.get(0).get(1));
+			c = c*Math.abs(mnc.get(0).get(1));
+			
+			//Bring x and c to the side of y so equation becomes AX+BY+C=0
+			a = -a;
+			c = -c;
+			
+			//Numerator of perpendicular distance
+			double numerator = (a*px) + (b*py) + c;
+			
+			//Return depends on whether user wants to keep accuracy of answer
+			//If accuracy is true, function will return a list with 2 items. Index 0 is the numerator. Index 1 is the denominator, whose value have yet to be square rooted
+			//If accuracy is false, function will return a list with 1 item. Index 0 contains the numerical distance in string format.
+			if(accuracy){
+				List<String> answer = new ArrayList<String>();
+				answer.add(String.valueOf(numerator));
+				double denominator = Math.pow(a, 2)+Math.pow(b, 2);
+				answer.add("Square root of "+String.valueOf(denominator));
+				return answer;
+			}
+			else{
+				//Denominator of perpendicular distance
+				double denominator = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2));
+				List<String> answer = new ArrayList<String>();
+				answer.add(String.valueOf(Math.abs(numerator/denominator)));
+				return answer;
+			}
 		}
 	}
 	

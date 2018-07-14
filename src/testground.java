@@ -16,17 +16,6 @@ public class testground{
 		
 		//TSP optimizer
 		//TSPOptimizer.run();
-		
-		//Inputs
-		double ax = 3;
-		double ay = 4;
-		double bx = 7;
-		double by = 5;
-		double px = 2;
-		double py = 3;
-		boolean accuracy = false;
-		
-		System.out.println(MathKit.PerpendicularDistDouble(ax,ay,bx,by,px,py,accuracy));
 	}
 }
 	
