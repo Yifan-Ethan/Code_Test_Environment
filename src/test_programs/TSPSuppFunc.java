@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import test_objects.TSPtestnode;
+import test_objects.TSPtestpath;
 import yifan_toolkit.MathKit;
 
 public class TSPSuppFunc {
@@ -110,6 +111,7 @@ public class TSPSuppFunc {
 	 * @return
 	 */
 	public static TSPtestnode TranverseToOppositeEnd(TSPtestnode o){
+		System.out.println(o);
 		if(o.getLink1() == null){
 			TSPtestnode previousnode = o.getLink1();
 			while(o!=null){
@@ -177,11 +179,16 @@ public class TSPSuppFunc {
 	 * @return
 	 */
 	public static double CircuitDist(TSPtestnode o){
+		
 		int originid = o.getId();
 		TSPtestnode previousnode = o.getLink1();
+		
 		double totaldist = 0;
+		
 		totaldist= totaldist + MathKit.DoubleTwoDEuclideanDist(o.getX(), o.getY(), previousnode.getX(), previousnode.getY());
+		
 		while(o.TranverseNode(previousnode).getId()!=originid){
+			
 			totaldist= totaldist + MathKit.DoubleTwoDEuclideanDist(o.getX(), o.getY(), o.TranverseNode(previousnode).getX(), o.TranverseNode(previousnode).getY());
 			
 			TSPtestnode dump = o;	//Saves this node to be assigned to previous node
@@ -253,5 +260,111 @@ public class TSPSuppFunc {
 			nodemap.get(pathnodeID2).setLink2((nodemap.get(pathnodeID1)));
 		}
 		return nodemap;
+	}
+
+	/**
+	 * Creates a list of edges belonging to a circuit. Each edge is represented as a path.
+	 * @param lastnodeid
+	 * @param nodemap
+	 * @return
+	 */
+	public static List<TSPtestpath> CircuitEdges(TSPtestnode o) {
+		
+		List<TSPtestpath> edges = new ArrayList<TSPtestpath>();
+		
+		int originid = o.getId();
+		TSPtestnode previousnode = o.getLink1();
+		edges.add(new TSPtestpath(o.getId(),o.getLink1().getId()));
+		while(o.TranverseNode(previousnode).getId()!=originid){
+			
+			edges.add(new TSPtestpath(o.getId(),o.TranverseNode(previousnode).getId()));
+			
+			TSPtestnode dump = o;	//Saves this node to be assigned to previous node
+			o = o.TranverseNode(previousnode);	//Main node moves on to next node
+			previousnode = dump;	//Saves previous node, which is needed for main node to proceed to next node in the right direction
+			
+		}
+		
+		return edges;
+	}
+
+	/**
+	 * Removes paths that are no longer needed
+	 * @param paths
+	 * @return
+	 */
+	public static List<TSPtestpath> RemoveObsoletePaths(List<TSPtestpath> paths,List<Integer> circuitnodes) {
+		for(int i=0;i<paths.size();i++){
+			for(int k=0;k<circuitnodes.size();k++){
+				for(int l=k+1;l<circuitnodes.size();l++){
+					if((paths.get(i).getNode1ID()==circuitnodes.get(k) && paths.get(i).getNode2ID()==circuitnodes.get(l)) ||
+							(paths.get(i).getNode2ID()==circuitnodes.get(k) && paths.get(i).getNode1ID()==circuitnodes.get(l))	){
+						paths.remove(i);
+						i--;
+						if(i==-1){
+							k=circuitnodes.size();
+							l=circuitnodes.size();
+						}
+					}
+				}
+			}
+		}
+		return paths;
+	}
+
+	/**
+	 * Returns a list of paths from each circuit node to new node
+	 * @param circuitnodes
+	 * @param nodemap
+	 * @param closestnodetocircuit 
+	 * @return
+	 */
+	public static List<TSPtestpath> DistFromCircuitNodesToNewNode(List<Integer> circuitnodes, HashMap<Integer, TSPtestnode> nodemap, TSPtestnode n) {
+		
+		List<TSPtestpath> paths = new ArrayList<TSPtestpath>();
+		
+		for(int i=0;i<circuitnodes.size();i++){
+			TSPtestnode nc = nodemap.get(circuitnodes.get(i));
+			paths.add(new TSPtestpath(n.getId(), nc.getId(), MathKit.DoubleTwoDEuclideanDist(n.getX(), n.getY(), nc.getX(), nc.getY())));
+		}
+		
+		return paths;
+	}
+
+	/**
+	 * Scans all edges in circuit to check if new edge will result in an interception
+	 * @param CircuitEdges
+	 * @param nodemap
+	 * @param newnode
+	 * @param circuitnode
+	 * @return
+	 */
+	public static boolean ScanEdgesForInterception(List<TSPtestpath> CircuitEdges, HashMap<Integer, TSPtestnode> nodemap, TSPtestnode newnode, TSPtestnode circuitnode) {
+		for(int k=0;k<CircuitEdges.size();k++){
+			TSPtestnode cep1 = nodemap.get(CircuitEdges.get(k).getNode1ID());
+			TSPtestnode cep2 = nodemap.get(CircuitEdges.get(k).getNode2ID());
+			if(MathKit.IfEdgesIntersect(newnode.getX(), newnode.getY(), circuitnode.getX(), circuitnode.getY(), cep1.getX(), cep1.getY(), cep2.getX(), cep2.getY())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if 2 edges are parallel
+	 * @return
+	 */
+	public static boolean IsNotParallel(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
+		List<List<Double>> e1MNC = MathKit.GraphLinearEquationMNCDouble(e1x1, e1y1, e1x2, e1y2);
+		List<List<Double>> e2MNC = MathKit.GraphLinearEquationMNCDouble(e2x1, e2y1, e2x2, e2y2);
+		
+		//If edges are parallel, return false
+		if(
+		  (e1MNC.get(0).get(0).equals(e2MNC.get(0).get(0))) &&
+		  (e1MNC.get(0).get(1).equals(e2MNC.get(0).get(1)))
+		  ){
+			return false;
+		}
+		return true;
 	}
 }

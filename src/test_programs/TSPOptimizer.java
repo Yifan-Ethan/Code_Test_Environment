@@ -95,32 +95,22 @@ public class TSPOptimizer {
 			}
 		}
 		
+		List<TSPtestpath> CircuitEdges = TSPSuppFunc.CircuitEdges(nodemap.get(lastnodeid));
+		
 		TSPtestnode n = nodemap.get(lastnodeid);
 		List<Integer> circuitnodes = TSPSuppFunc.nodesincircuit(n);
 		nodescount = circuitnodes.size();
 		
 		while(nodescount!=totalnodes){
 		
-			//Removes obsolete paths to save computing time
-			for(int i=0;i<paths.size();i++){
-				for(int k=0;k<circuitnodes.size();k++){
-					for(int l=k+1;l<circuitnodes.size();l++){
-						if((paths.get(i).getNode1ID()==circuitnodes.get(k) && paths.get(i).getNode2ID()==circuitnodes.get(l)) ||
-								(paths.get(i).getNode2ID()==circuitnodes.get(k) && paths.get(i).getNode1ID()==circuitnodes.get(l))	){
-							paths.remove(i);
-							i--;
-							if(i==-1){
-								k = circuitnodes.size();
-								l = circuitnodes.size();
-							}
-						}
-					}
-				}
-			}
+			//Removes obsolete paths
+			paths = TSPSuppFunc.RemoveObsoletePaths(paths,circuitnodes);
 			
+			//Is the next path a single node or a route of nodes
 			int pathnature = 0;
+			
+			//Node that is closest to a certain node in circuit
 			TSPtestnode closestnodetocircuit = new TSPtestnode();
-			TSPtestnode closestpointoncircuit = new TSPtestnode();
 			
 			//Scans for shortest paths with open node closest to circuit
 			for(int i=0;i<paths.size();i++){
@@ -134,11 +124,44 @@ public class TSPOptimizer {
 							pathnature = TSPSuppFunc.PathNature(nodemap.get(paths.get(i).getNode1ID()));
 							closestnodetocircuit = nodemap.get(paths.get(i).getNode1ID());
 						}
-						closestpointoncircuit = nodemap.get(circuitnodes.get(k));
 						paths.remove(i);
 						i = paths.size();
 						k = circuitnodes.size();
 					}
+				}
+			}
+			
+			//List of paths from new node to all nodes in circuit
+			List<TSPtestpath> circuitnodetonewnode = TSPSuppFunc.DistFromCircuitNodesToNewNode(circuitnodes, nodemap, closestnodetocircuit);
+			
+			//Sort paths in ascending order
+			Collections.sort(circuitnodetonewnode, new Comparator<TSPtestpath>() {
+				public int compare(TSPtestpath o1, TSPtestpath o2) {
+					// TODO Auto-generated method stub
+					if(o1.getDistance() > o2.getDistance()){
+						return 1;
+					}
+					else if(o1.getDistance() == o2.getDistance()){
+						return 0;
+					}
+					else{
+						return -1;
+					}
+				}
+		    });
+			
+			//Node on circuit that is closest to node not in circuit
+			TSPtestnode closestpointoncircuit = new TSPtestnode();
+			
+			//Scans for node in circuit that joins new node via the shortest distance and not cut across existing edges
+			//Note that the new node is always stored as ID 1
+			for(int i=0;i<circuitnodetonewnode.size();i++){
+				boolean intercepted = false;
+				TSPtestnode circuitnode = nodemap.get(circuitnodetonewnode.get(i).getNode2ID());
+				intercepted = TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,closestnodetocircuit,circuitnode);
+				if(intercepted == false){
+					i = circuitnodetonewnode.size();
+					closestpointoncircuit = circuitnode;
 				}
 			}
 			
@@ -148,13 +171,32 @@ public class TSPOptimizer {
 				TSPtestnode rightnode = closestpointoncircuit.getLink2();
 				double leftnodedistance = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
 				double rightnodedistance = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
-				if(leftnodedistance<=rightnodedistance){
+				CircuitEdges.add(new TSPtestpath(closestpointoncircuit.getId(),closestnodetocircuit.getId()));
+				System.out.println("Log");
+				System.out.println("New point to connect: "+closestnodetocircuit);
+				System.out.println("Closest point on circuit: "+closestpointoncircuit);
+				System.out.println("Left node: "+leftnode);
+				System.out.println("Right node: "+rightnode);
+				System.out.println("Output test: "+TSPSuppFunc.IsNotParallel(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY()));
+				//This condition means if (left node is shorter AND pass the test) OR (right node fails the test) 
+				//Test consists of 2 elements: Check for interception with edges in circuit and whether edge will be parallel to other new edge
+				if((leftnodedistance<=rightnodedistance && 
+				   TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,leftnode,closestnodetocircuit)==false && 
+				   TSPSuppFunc.IsNotParallel(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY()))
+				   ||
+				   TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,rightnode,closestnodetocircuit)==true || 
+				   TSPSuppFunc.IsNotParallel(rightnode.getX(), rightnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY()) == false
+				){
 					nodemap = TSPSuppFunc.ResetNodesOnCircuitToNode(leftnode, closestpointoncircuit, closestnodetocircuit, nodemap);
 					lastnodeid = closestnodetocircuit.getId();
+					//Circuit edges need to be reset after each run. This is because the previous connection of nearest node with its left or right needs to be removed
+					CircuitEdges = TSPSuppFunc.CircuitEdges(nodemap.get(lastnodeid));
 				}
 				else{
 					nodemap = TSPSuppFunc.ResetNodesOnCircuitToNode(rightnode, closestpointoncircuit, closestnodetocircuit, nodemap);
 					lastnodeid = closestnodetocircuit.getId();
+					//Circuit edges need to be reset after each run. This is because the previous connection of nearest node with its left or right needs to be removed
+					CircuitEdges = TSPSuppFunc.CircuitEdges(nodemap.get(lastnodeid));
 				}
 			}
 			//If path points to a route
@@ -164,21 +206,36 @@ public class TSPOptimizer {
 				TSPtestnode rightnode = closestpointoncircuit.getLink2();
 				double leftnodedistance = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), routeend.getX(), routeend.getY());
 				double rightnodedistance = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), routeend.getX(), routeend.getY());
-				if(leftnodedistance<=rightnodedistance){
+				CircuitEdges.add(new TSPtestpath(closestpointoncircuit.getId(),closestnodetocircuit.getId()));
+				//This condition means if (left node is shorter AND pass the test) OR (right node fails the test) 
+				//Test consists of 2 elements: Check for interception with edges in circuit and whether edge will be parallel to other new edge
+				if((leftnodedistance<=rightnodedistance && 
+				   TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,leftnode,routeend)==false && 
+				   TSPSuppFunc.IsNotParallel(leftnode.getX(), leftnode.getY(), routeend.getX(), routeend.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), routeend.getX(), routeend.getY()))
+				   ||
+				   TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,rightnode,routeend)==true || 
+				   TSPSuppFunc.IsNotParallel(rightnode.getX(), rightnode.getY(), routeend.getX(), routeend.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), routeend.getX(), routeend.getY()) == false
+				){
 					nodemap = TSPSuppFunc.ResetNodesOnCircuitToRoute(closestpointoncircuit, leftnode, closestnodetocircuit, routeend, nodemap);
 					lastnodeid = closestnodetocircuit.getId();
+					//Circuit edges need to be reset after each run. This is because the previous connection of nearest node with its left or right needs to be removed
+					CircuitEdges = TSPSuppFunc.CircuitEdges(nodemap.get(lastnodeid));
 				}
 				else{
 					nodemap = TSPSuppFunc.ResetNodesOnCircuitToRoute(closestpointoncircuit, rightnode, closestnodetocircuit, routeend, nodemap);
 					lastnodeid = closestnodetocircuit.getId();
+					//Circuit edges need to be reset after each run. This is because the previous connection of nearest node with its left or right needs to be removed
+					CircuitEdges = TSPSuppFunc.CircuitEdges(nodemap.get(lastnodeid));
 				}
 			}
 			
 			n = nodemap.get(lastnodeid);
+			System.out.println("New search");
+			TSPSuppFunc.LogCircuit(n);
 			circuitnodes = TSPSuppFunc.nodesincircuit(n);
 			nodescount = circuitnodes.size();
 		}
-		TSPSuppFunc.LogCircuit(n);
+		//TSPSuppFunc.LogCircuit(n);
 		System.out.println(TSPSuppFunc.CircuitDist(n));
 	}
 	

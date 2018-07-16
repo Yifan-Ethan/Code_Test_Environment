@@ -6,6 +6,11 @@ public class TSPtestpath {
 	int node1ID = 0;
 	int node2ID = 0;
 	
+	public TSPtestpath(int node1,int node2){
+		this.node1ID = node1;
+		this.node2ID = node2;
+	}
+	
 	public TSPtestpath(int node1,int node2,double distance){
 		this.node1ID = node1;
 		this.node2ID = node2;

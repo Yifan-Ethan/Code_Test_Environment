@@ -12,6 +12,9 @@ import java.util.List;
  * This is to ensure that code logic can be easily understood, and easily transferred to a new language
  * This class contains
  * 
+ * General Mathematics
+ * 1. Fraction of two number (Fraction)
+ * 
  * Permuations and combinations
  * 1. Combinations calculator (ncr)
  * 2. Permutations without repetition for numerals (nprnorepeatnumeric)
@@ -29,6 +32,7 @@ import java.util.List;
  * 3. Formulate the gradient and y-intercept of linear equation based on 2 points on graph for BigInteger (GraphLinearEquationMNCBigInt)
  * 4. Formulate the gradient and y-intercept of linear equation based on 2 points on graph for double (GraphLinearEquationMNCDouble)
  * 5. Calculate the perpendicular distance between an edge represented by 2 points to a certain point. Inputs and outputs are of type Double (PerpendicularDistDouble)
+ * 6. Checks if 2 edges intersect (IfEdgesIntersect)
  * 
  * Investigation of a number
  * 1. Checks if number is prime (isPrime)
@@ -36,6 +40,7 @@ import java.util.List;
  * 3. Finds the number of decimal places of a number (decimalplaces)
  * 4. Checks the number of digits in a number (digits)
  * 5. Finds all factors of a number (allfactors)
+ * 6. Greatest common multiplier of 2 numbers (GreatestCommonMultiplier)
  * 
  * Calculation for scientific purposes
  * 1. Cantor pairing function, uniquely encode 2 natural numbers into a single natural number (pairingfunction)
@@ -258,13 +263,17 @@ public class MathKit {
 			
 		//Calculate fraction for the gradient
 		List<Double> m = new ArrayList<Double>();
-		m.add(ay-by);		//This is Y1 - Y2 in gradient calculation
-		m.add(ax-bx);		//This is X1 - X2 in gradient calculation
+		String fraction = Fraction(ay-by,ax-bx);	//Simplifies the fraction
+		String[] dump = fraction.split("/");
+		m.add(Double.parseDouble(dump[0]));		//This is Y1 - Y2 in gradient calculation
+		m.add(Double.parseDouble(dump[1]));		//This is X1 - X2 in gradient calculation
 			
 		//Calculate fraction for the y-intercept
 		List<Double> c = new ArrayList<Double>();
-		c.add(((ax-bx)*ay)-((ay-by)*ax));	//This is the y-intercept value (c value) in linear equation
-		c.add(ax-bx);															//This is X1 - X2 in gradient calculation
+		fraction = Fraction(((ax-bx)*ay)-((ay-by)*ax),ax-bx);	//Simplifies the fraction
+		dump = fraction.split("/");
+		c.add(Double.parseDouble(dump[0]));		//This is the y-intercept value (c value) in linear equation
+		c.add(Double.parseDouble(dump[1]));		//This is X1 - X2 in gradient calculation
 			
 		//Add both gradient and y-intercept to list that will be returned
 		mnc.add(m);
@@ -450,5 +459,143 @@ public class MathKit {
 		BigInteger nfactorial = (factorial(BigInteger.valueOf(n)));
 		BigInteger nminusrfactorial = (factorial(BigInteger.valueOf(n-r)));
 		return nfactorial.divide(nminusrfactorial);
+	}
+	
+	/**
+	 * Returns the greatest common multiplier of 2 numbers a and b
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static double GreatestCommonMultiplier(double a, double b) {
+	    return b == 0 ? a : GreatestCommonMultiplier(b, a % b); 
+	}
+	
+	/**
+	 * Provides and simplifies the fraction of 2 numbers
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static String Fraction(double a, double b) {
+		double GCM = GreatestCommonMultiplier(a, b);
+		a = a / GCM;
+		b = b / GCM;
+		if(Math.abs(b)==0){
+			b = 0;
+		}
+	    return a + "/" + b;
+	}
+	
+	/**
+	 * This function checks if 2 edges intersect. Note that intersect is NOT counted if edge 1 touches edge 2 with its tip.
+	 * e1 stands for edge 1, and e2 stands for edge 2
+	 * Inputs are start and end points of both edges, with x and y representing their coordinates
+	 * @param e1x1
+	 * @param e1y1
+	 * @param e1x2
+	 * @param e1y2
+	 * @param e2x1
+	 * @param e2y1
+	 * @param e2x2
+	 * @param e2y2
+	 * @return
+	 */
+	public static boolean IfEdgesIntersect(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
+		List<List<Double>> e1MNC = MathKit.GraphLinearEquationMNCDouble(e1x1, e1y1, e1x2, e1y2);
+		List<List<Double>> e2MNC = MathKit.GraphLinearEquationMNCDouble(e2x1, e2y1, e2x2, e2y2);
+
+		//If edges are parallel
+		if(
+		   (e1MNC.get(0).get(0).equals(e2MNC.get(0).get(0))) &&
+		   (e1MNC.get(0).get(1).equals(e2MNC.get(0).get(1)))
+		   ){
+			return false;
+		}
+		else{
+			
+			double x = 0;
+			double y = 0;
+			
+			//If edge 1 is vertical but edge 2 is not
+			if((e1MNC.get(1).get(1) == 0) && (e2MNC.get(1).get(1) != 0)){
+				x = e1x1;
+				double e2m = e2MNC.get(0).get(0)/e2MNC.get(0).get(1);
+				double e2c = (e2MNC.get(1).get(0)/e2MNC.get(1).get(1));
+				y = (e2m*x)+e2c;
+				//Checks if intersection of 2 edges lies on both edges
+				if(
+				   (((e1x1<=x) && (x<=e1x2)) || ((e1x1>=x)&&(x>=e1x2))) &&
+				   (((e1y1<y) && (y<e1y2)) || ((e1y1>y)&&(y>e1y2))) &&
+				   (((e2x1<x) && (x<e2x2)) || ((e2x1>x)&&(x>e2x2))) &&
+				   (((e2y1<y) && (y<e2y2)) || ((e2y1>y)&&(y>e2y2)))
+				   ){
+					return true;
+				}
+			}
+			//If edge 2 is vertical but edge 1 is not
+			else if((e2MNC.get(1).get(1) == 0) && (e1MNC.get(1).get(1) != 0)){
+				x = e2x1;
+				double e1m = e1MNC.get(0).get(0)/e1MNC.get(0).get(1);
+				double e1c = (e1MNC.get(1).get(0)/e1MNC.get(1).get(1));
+				y = (e1m*x)+e1c;
+				//Checks if intersection of 2 edges lies on both edges
+				if(
+				   (((e1x1<x) && (x<e1x2)) || ((e1x1>x)&&(x>e1x2))) &&
+				   (((e1y1<y) && (y<e1y2)) || ((e1y1>y)&&(y>e1y2))) &&
+				   (((e2x1<=x) && (x<=e2x2)) || ((e2x1>=x)&&(x>=e2x2))) &&
+				   (((e2y1<y) && (y<e2y2)) || ((e2y1>y)&&(y>e2y2)))
+				   ){
+					return true;
+				}
+			}
+			//If none of the 2 edges are vertical
+			else{
+				double e2c = (e2MNC.get(1).get(0)/e2MNC.get(1).get(1));
+				double e1c = (e1MNC.get(1).get(0)/e1MNC.get(1).get(1));
+				double xnum = e2c-e1c;
+				double e1m = e1MNC.get(0).get(0)/e1MNC.get(0).get(1);
+				double e2m = e2MNC.get(0).get(0)/e2MNC.get(0).get(1);
+				double xdenom = e1m-e2m;
+				x = xnum/xdenom;
+				y = (e1m*x)+e1c;
+
+				//If edge 1 is horizontal
+				if(e1MNC.get(0).get(0) == 0){
+					if(
+					   (((e1x1<x) && (x<e1x2)) || ((e1x1>x)&&(x>e1x2))) &&
+					   (((e1y1<=y) && (y<=e1y2)) || ((e1y1>=y)&&(y>=e1y2))) &&
+					   (((e2x1<x) && (x<e2x2)) || ((e2x1>x)&&(x>e2x2))) &&
+					   (((e2y1<y) && (y<e2y2)) || ((e2y1>y)&&(y>e2y2)))
+					   ){
+							return true;
+					}
+				}
+				//If edge 2 is horizontal
+				else if(e2MNC.get(0).get(0) == 0){
+					if(
+					   (((e1x1<x) && (x<e1x2)) || ((e1x1>x)&&(x>e1x2))) &&
+					   (((e1y1<y) && (y<e1y2)) || ((e1y1>y)&&(y>e1y2))) &&
+					   (((e2x1<x) && (x<e2x2)) || ((e2x1>x)&&(x>e2x2))) &&
+					   (((e2y1<=y) && (y<=e2y2)) || ((e2y1>=y)&&(y>=e2y2)))
+					   ){
+							return true;
+					}
+				}
+				//Checks if intersection of 2 edges lies on both edges
+				else{
+					if(
+					   (((e1x1<x) && (x<e1x2)) || ((e1x1>x)&&(x>e1x2))) &&
+					   (((e1y1<y) && (y<e1y2)) || ((e1y1>y)&&(y>e1y2))) &&
+					   (((e2x1<x) && (x<e2x2)) || ((e2x1>x)&&(x>e2x2))) &&
+					   (((e2y1<y) && (y<e2y2)) || ((e2y1>y)&&(y>e2y2)))
+					   ){
+							return true;
+					}
+				}
+			}
+			
+			return false;
+		}
 	}
 }

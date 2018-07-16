@@ -15,7 +15,7 @@ public class testground{
 		//TSPBruteForceControl.run();
 		
 		//TSP optimizer
-		//TSPOptimizer.run();
+		TSPOptimizer.run();
 	}
 }
 	
