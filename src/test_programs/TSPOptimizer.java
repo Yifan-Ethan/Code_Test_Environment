@@ -169,18 +169,14 @@ public class TSPOptimizer {
 			if(pathnature == 1){
 				TSPtestnode leftnode = closestpointoncircuit.getLink1();
 				TSPtestnode rightnode = closestpointoncircuit.getLink2();
-				double leftnodedistance = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
-				double rightnodedistance = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
+				double newleftedge = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
+				double newrightedge = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
+				double existingleftedge = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY());
+				double existingrightedge = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY());
 				CircuitEdges.add(new TSPtestpath(closestpointoncircuit.getId(),closestnodetocircuit.getId()));
-				System.out.println("Log");
-				System.out.println("New point to connect: "+closestnodetocircuit);
-				System.out.println("Closest point on circuit: "+closestpointoncircuit);
-				System.out.println("Left node: "+leftnode);
-				System.out.println("Right node: "+rightnode);
-				System.out.println("Output test: "+TSPSuppFunc.IsNotParallel(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY()));
 				//This condition means if (left node is shorter AND pass the test) OR (right node fails the test) 
 				//Test consists of 2 elements: Check for interception with edges in circuit and whether edge will be parallel to other new edge
-				if((leftnodedistance<=rightnodedistance && 
+				if(((newleftedge+existingrightedge)<=(newrightedge+existingleftedge) &&
 				   TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,leftnode,closestnodetocircuit)==false && 
 				   TSPSuppFunc.IsNotParallel(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY()))
 				   ||
@@ -204,12 +200,14 @@ public class TSPOptimizer {
 				TSPtestnode routeend = TSPSuppFunc.TranverseToOppositeEnd(closestnodetocircuit);
 				TSPtestnode leftnode = closestpointoncircuit.getLink1();
 				TSPtestnode rightnode = closestpointoncircuit.getLink2();
-				double leftnodedistance = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), routeend.getX(), routeend.getY());
-				double rightnodedistance = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), routeend.getX(), routeend.getY());
+				double newleftedge = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
+				double newrightedge = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), closestnodetocircuit.getX(), closestnodetocircuit.getY());
+				double existingleftedge = MathKit.DoubleTwoDEuclideanDist(leftnode.getX(), leftnode.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY());
+				double existingrightedge = MathKit.DoubleTwoDEuclideanDist(rightnode.getX(), rightnode.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY());
 				CircuitEdges.add(new TSPtestpath(closestpointoncircuit.getId(),closestnodetocircuit.getId()));
 				//This condition means if (left node is shorter AND pass the test) OR (right node fails the test) 
 				//Test consists of 2 elements: Check for interception with edges in circuit and whether edge will be parallel to other new edge
-				if((leftnodedistance<=rightnodedistance && 
+				if(((newleftedge+existingrightedge)<=(newrightedge+existingleftedge) && 
 				   TSPSuppFunc.ScanEdgesForInterception(CircuitEdges,nodemap,leftnode,routeend)==false && 
 				   TSPSuppFunc.IsNotParallel(leftnode.getX(), leftnode.getY(), routeend.getX(), routeend.getY(), closestpointoncircuit.getX(), closestpointoncircuit.getY(), routeend.getX(), routeend.getY()))
 				   ||
@@ -230,8 +228,6 @@ public class TSPOptimizer {
 			}
 			
 			n = nodemap.get(lastnodeid);
-			System.out.println("New search");
-			TSPSuppFunc.LogCircuit(n);
 			circuitnodes = TSPSuppFunc.nodesincircuit(n);
 			nodescount = circuitnodes.size();
 		}

@@ -12,10 +12,15 @@ public class testground{
 	public static void main(String[] args) throws IOException {		
 		
 		//Brute force technique deployed as a control
-		//TSPBruteForceControl.run();
+		long startTime = System.currentTimeMillis();
+		TSPBruteForceControl.run();
+		System.out.println("COMPLETE: Total time taken is " +(System.currentTimeMillis() - startTime)+" milliseconds");
+		
 		
 		//TSP optimizer
-		TSPOptimizer.run();
+		//long startTime = System.currentTimeMillis();
+		//TSPOptimizer.run();
+		//System.out.println("COMPLETE: Total time taken is " +(System.currentTimeMillis() - startTime)+" milliseconds");
 	}
 }
 	
