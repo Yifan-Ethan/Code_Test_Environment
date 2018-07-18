@@ -1,12 +1,15 @@
 package test_programs;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 import test_objects.TSPtestnode;
 import test_objects.TSPtestpath;
 import yifan_toolkit.MathKit;
+import yifan_toolkit.UtilityKit;
 
 public class TSPSuppFunc {
 	/**
@@ -199,7 +202,7 @@ public class TSPSuppFunc {
 	}
 	
 	/**
-	 * Checks if circuit is closed
+	 * Checks if node belongs to a closed circuit
 	 * @param o
 	 * @return
 	 */
@@ -366,5 +369,79 @@ public class TSPSuppFunc {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Create nodes, add value to them and add nodes to list
+	 * Code within this loop largely depend on format at which node information is kept in file
+	 * Current implement assumes format to be "1 385 204", where first number represent node index (useless), 2nd number is x coordinate, 3rd number is y coordinate
+	 * @param rows 
+	 * @return
+	 */
+	public static List<TSPtestnode> CreateNodes(List<String> rows) {
+		List<TSPtestnode> nodes = new ArrayList<TSPtestnode>();
+		for(int i=0;i<rows.size();i++){
+			List<String> dump = UtilityKit.stringtolistbydelimiter(rows.get(i), " ");
+			nodes.add(new TSPtestnode(i,Double.valueOf(dump.get(1)),Double.valueOf(dump.get(2))));
+		}
+		return nodes;
+	}
+
+	/**
+	 * Remove repeated nodes that are kept in list
+	 * @param nodes 
+	 * @return
+	 */
+	public static List<TSPtestnode> RemoveDupNodes(List<TSPtestnode> nodes) {
+		for(int i=0;i<nodes.size();i++){
+			for(int j=i+1;j<nodes.size();j++){
+				if((nodes.get(i).getX()==nodes.get(j).getX()) &&
+				  (nodes.get(i).getY()==nodes.get(j).getY())
+				  ){
+					nodes.remove(j);
+					j--;
+				}
+			}
+		}
+		return nodes;
+	}
+
+	/**
+	 * Create all possible paths from all available nodes
+	 * @param nodes 
+	 * @return
+	 */
+	public static List<TSPtestpath> GenerateAllPaths(List<TSPtestnode> nodes) {
+		List<TSPtestpath> paths = new ArrayList<TSPtestpath>();
+		for(int i=0;i<nodes.size();i++){
+			for(int j=i+1;j<nodes.size();j++){
+				TSPtestpath path = new TSPtestpath(nodes.get(i).getId(), nodes.get(j).getId(), MathKit.DoubleTwoDEuclideanDist(nodes.get(i).getX(), nodes.get(i).getY(), nodes.get(j).getX(), nodes.get(j).getY()));
+				paths.add(path);
+			}
+		}
+		return paths;
+	}
+
+	/**
+	 * Sort paths in ascending order
+	 * @param paths
+	 * @return
+	 */
+	public static List<TSPtestpath> SortPathsAscending(List<TSPtestpath> paths) {
+		Collections.sort(paths, new Comparator<TSPtestpath>() {
+			public int compare(TSPtestpath o1, TSPtestpath o2) {
+				// TODO Auto-generated method stub
+				if(o1.getDistance() > o2.getDistance()){
+					return 1;
+				}
+				else if(o1.getDistance() == o2.getDistance()){
+					return 0;
+				}
+				else{
+					return -1;
+				}
+			}
+	    });
+		return paths;
 	}
 }

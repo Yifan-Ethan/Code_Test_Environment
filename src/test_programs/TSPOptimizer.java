@@ -15,36 +15,27 @@ import yifan_toolkit.UtilityKit;
 public class TSPOptimizer {
 
 	public static void run() throws FileNotFoundException{
+		
+		//Read values of coordinates
 		String data = UtilityKit.readfile("test.txt");
 		
+		//Create a list of node values. Each entry represents information regarding one node
 		List<String> rows = UtilityKit.stringtolistbydelimiter(data, "\n");
+		
+		//A list of all nodes in existence
 		List<TSPtestnode> nodes = new ArrayList<TSPtestnode>();
+		
+		//A list of all available paths
 		List<TSPtestpath> paths = new ArrayList<TSPtestpath>();
+		
+		//A map with all available nodes. Allows for quick retrieval of a specific node using nodeID
 		HashMap<Integer, TSPtestnode> nodemap = new HashMap<Integer, TSPtestnode>();
 		
-		int nodescount = 0;
-		int totalnodes = 0;
-		
 		//Create nodes, add value to them and add nodes to list
-		for(int i=0;i<rows.size();i++){
-			List<String> dump = UtilityKit.stringtolistbydelimiter(rows.get(i), " ");
-			TSPtestnode node = new TSPtestnode(i,Double.valueOf(dump.get(1)),Double.valueOf(dump.get(2)));
-			nodes.add(node);
-		}
-		
-		totalnodes = nodes.size();
+		nodes = TSPSuppFunc.CreateNodes(rows);
 		
 		//Remove dups
-		for(int i=0;i<nodes.size();i++){
-			for(int j=i+1;j<nodes.size();j++){
-				if((nodes.get(i).getX()==nodes.get(j).getX()) &&
-				  (nodes.get(i).getY()==nodes.get(j).getY())
-				  ){
-					nodes.remove(j);
-					j--;
-				}
-			}
-		}
+		nodes = TSPSuppFunc.RemoveDupNodes(nodes);
 		
 		//Remaps nodes to hashmap for quick access via ID
 		for(int i=0;i<nodes.size();i++){
@@ -52,56 +43,38 @@ public class TSPOptimizer {
 		}
 		
 		//Scans for all possible paths between 2 nodes
-		for(int i=0;i<nodes.size();i++){
-			for(int j=i+1;j<nodes.size();j++){
-				TSPtestnode node1 = nodes.get(i);
-				TSPtestnode node2 = nodes.get(j);
-				TSPtestpath path = new TSPtestpath(node1.getId(), node2.getId(), MathKit.DoubleTwoDEuclideanDist(node1.getX(), node1.getY(), node2.getX(), node2.getY()));
-				paths.add(path);
-			}
-		}
+		paths = TSPSuppFunc.GenerateAllPaths(nodes);
 		
 		//Sort paths in ascending order
-		Collections.sort(paths, new Comparator<TSPtestpath>() {
-			public int compare(TSPtestpath o1, TSPtestpath o2) {
-				// TODO Auto-generated method stub
-				if(o1.getDistance() > o2.getDistance()){
-					return 1;
-				}
-				else if(o1.getDistance() == o2.getDistance()){
-					return 0;
-				}
-				else{
-					return -1;
-				}
-			}
-	    });
-
-		int lastnodeid = 0;
+		paths = TSPSuppFunc.SortPathsAscending(paths);
 		
-		//Scans and creates paths using shortest path, eventually creating a local closed circuit
+		//Tracks the number of nodes that have been joined
+		int joinednodes = 1;
+		
+		//Scans and joins all nodes using shortest path, and stops when all nodes have been joined with one or two other nodes
 		for(int i=0;i<paths.size();i++){
-			int pathnodeID1 = paths.get(i).getNode1ID();
-			int pathnodeID2 = paths.get(i).getNode2ID();
-			if(TSPSuppFunc.CanConnect(nodemap.get(pathnodeID1)) && TSPSuppFunc.CanConnect(nodemap.get(pathnodeID2))){
-				nodemap = TSPSuppFunc.ConnectNodes(pathnodeID1, pathnodeID2, nodemap);
+			if(TSPSuppFunc.CanConnect(nodemap.get(paths.get(i).getNode1ID())) && TSPSuppFunc.CanConnect(nodemap.get(paths.get(i).getNode2ID()))){
+				nodemap = TSPSuppFunc.ConnectNodes(paths.get(i).getNode1ID(), paths.get(i).getNode2ID(), nodemap);
 				paths.remove(i);
 				i--;	//Since current path was removed, next path takes the index of current path
-				boolean stopsearch = TSPSuppFunc.circuitclosed(nodemap.get(pathnodeID1));
-				if(stopsearch==true){
+				joinednodes++;
+				if(joinednodes==nodes.size()){
 					i=paths.size();
-					lastnodeid = pathnodeID1;
 				}
 			}
 		}
+		
+		//DANGER ZONE: LOGIC FROM HERE ON NEEDS OVERHAUL. DO NOT VENTURE UNLESS CERTAIN
+		
+		//Stores the last node that was added to route/circuit
+		int lastnodeid = 0;
 		
 		List<TSPtestpath> CircuitEdges = TSPSuppFunc.CircuitEdges(nodemap.get(lastnodeid));
 		
 		TSPtestnode n = nodemap.get(lastnodeid);
 		List<Integer> circuitnodes = TSPSuppFunc.nodesincircuit(n);
-		nodescount = circuitnodes.size();
 		
-		while(nodescount!=totalnodes){
+		while(circuitnodes.size()!=nodes.size()){
 		
 			//Removes obsolete paths
 			paths = TSPSuppFunc.RemoveObsoletePaths(paths,circuitnodes);
@@ -135,20 +108,7 @@ public class TSPOptimizer {
 			List<TSPtestpath> circuitnodetonewnode = TSPSuppFunc.DistFromCircuitNodesToNewNode(circuitnodes, nodemap, closestnodetocircuit);
 			
 			//Sort paths in ascending order
-			Collections.sort(circuitnodetonewnode, new Comparator<TSPtestpath>() {
-				public int compare(TSPtestpath o1, TSPtestpath o2) {
-					// TODO Auto-generated method stub
-					if(o1.getDistance() > o2.getDistance()){
-						return 1;
-					}
-					else if(o1.getDistance() == o2.getDistance()){
-						return 0;
-					}
-					else{
-						return -1;
-					}
-				}
-		    });
+			circuitnodetonewnode = TSPSuppFunc.SortPathsAscending(circuitnodetonewnode);
 			
 			//Node on circuit that is closest to node not in circuit
 			TSPtestnode closestpointoncircuit = new TSPtestnode();
@@ -229,7 +189,6 @@ public class TSPOptimizer {
 			
 			n = nodemap.get(lastnodeid);
 			circuitnodes = TSPSuppFunc.nodesincircuit(n);
-			nodescount = circuitnodes.size();
 		}
 		//TSPSuppFunc.LogCircuit(n);
 		System.out.println(TSPSuppFunc.CircuitDist(n));
