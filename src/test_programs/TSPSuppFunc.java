@@ -157,7 +157,7 @@ public class TSPSuppFunc {
 	 * @param o
 	 * @return
 	 */
-	public static List<Integer> nodesincircuit(TSPtestnode o){
+	public static List<Integer> NodesInCircuit(TSPtestnode o){
 		List<Integer> nodes = new ArrayList<Integer>();
 		int originid = o.getId();
 		TSPtestnode previousnode = o.getLink1();
@@ -206,7 +206,7 @@ public class TSPSuppFunc {
 	 * @param o
 	 * @return
 	 */
-	public static boolean circuitclosed(TSPtestnode o){
+	public static boolean CircuitClosed(TSPtestnode o){
 		int originid = o.getId();
 		TSPtestnode previousnode = o.getLink1();
 		while(o.TranverseNode(previousnode)!=null){
@@ -335,18 +335,19 @@ public class TSPSuppFunc {
 	}
 
 	/**
-	 * Scans all edges in circuit to check if new edge will result in an interception
+	 * Scans all edges in circuit to check for any kind of intersections
 	 * @param CircuitEdges
 	 * @param nodemap
 	 * @param newnode
 	 * @param circuitnode
 	 * @return
 	 */
-	public static boolean ScanEdgesForInterception(List<TSPtestpath> CircuitEdges, HashMap<Integer, TSPtestnode> nodemap, TSPtestnode newnode, TSPtestnode circuitnode) {
+	public static boolean ScanEdgesForInterception(List<TSPtestpath> CircuitEdges, HashMap<Integer, TSPtestnode> nodemap, TSPtestnode newedgestart, TSPtestnode newedgeend) {
 		for(int k=0;k<CircuitEdges.size();k++){
 			TSPtestnode cep1 = nodemap.get(CircuitEdges.get(k).getNode1ID());
 			TSPtestnode cep2 = nodemap.get(CircuitEdges.get(k).getNode2ID());
-			if(MathKit.IfEdgesIntersect(newnode.getX(), newnode.getY(), circuitnode.getX(), circuitnode.getY(), cep1.getX(), cep1.getY(), cep2.getX(), cep2.getY())){
+			if(MathKit.IfEdgesCrossIntersect(newedgestart.getX(), newedgestart.getY(), newedgeend.getX(), newedgeend.getY(), cep1.getX(), cep1.getY(), cep2.getX(), cep2.getY()) ||
+			   MathKit.IfEdgesParallelIntersect(newedgestart.getX(), newedgestart.getY(), newedgeend.getX(), newedgeend.getY(), cep1.getX(), cep1.getY(), cep2.getX(), cep2.getY())){
 				return true;
 			}
 		}

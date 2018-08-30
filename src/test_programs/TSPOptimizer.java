@@ -51,9 +51,16 @@ public class TSPOptimizer {
 		//Tracks the number of nodes that have been joined
 		int joinednodes = 1;
 		
+		//Contains a list of edges. Each edge is joined by 2 nodes
+		List<TSPtestpath> edges = new ArrayList<TSPtestpath>();
+		
+		//TEST ScanEdgesForInterception FUNCTION THOROUGHLY BEFORE PROCEEDING
 		//Scans and joins all nodes using shortest path, and stops when all nodes have been joined with one or two other nodes
 		for(int i=0;i<paths.size();i++){
-			if(TSPSuppFunc.CanConnect(nodemap.get(paths.get(i).getNode1ID())) && TSPSuppFunc.CanConnect(nodemap.get(paths.get(i).getNode2ID()))){
+			if(TSPSuppFunc.CanConnect(nodemap.get(paths.get(i).getNode1ID())) && TSPSuppFunc.CanConnect(nodemap.get(paths.get(i).getNode2ID())) &&
+			   TSPSuppFunc.ScanEdgesForInterception(edges, nodemap, nodemap.get(paths.get(i).getNode1ID()), nodemap.get(paths.get(i).getNode2ID())))
+			{
+				edges.add(new TSPtestpath(paths.get(i).getNode1ID(), paths.get(i).getNode2ID()));
 				nodemap = TSPSuppFunc.ConnectNodes(paths.get(i).getNode1ID(), paths.get(i).getNode2ID(), nodemap);
 				paths.remove(i);
 				i--;	//Since current path was removed, next path takes the index of current path
@@ -62,6 +69,20 @@ public class TSPOptimizer {
 					i=paths.size();
 				}
 			}
+		}
+		
+		//Contains a map of nodes that are not in circuit
+		HashMap<Integer, TSPtestnode> nodesnotincircuit = new HashMap<Integer, TSPtestnode>();
+		
+		//Obtains a list of nodes that are within a circuit
+		List<Integer> nodesincircuit = TSPSuppFunc.NodesInCircuit(nodemap.get(nodemap.keySet().toArray()[0]));
+
+		//If node lies in a route and not a circuit
+		if(nodesincircuit == null){
+			
+		}
+		else{
+			
 		}
 		
 		//DANGER ZONE: LOGIC FROM HERE ON NEEDS OVERHAUL. DO NOT VENTURE UNLESS CERTAIN

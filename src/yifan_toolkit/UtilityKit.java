@@ -2,6 +2,7 @@ package yifan_toolkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -20,11 +21,85 @@ import javax.swing.JFileChooser;
  * 4. Read all contents from a txt file, with window to choose file (choosereadfile)
  * 5. Generate a random number from a given range (randomnumbergenerator)
  * 6. Generate a random string of characters with the specified length (randomstring)
+ * 7. Converts a byte array to hexadecimal (BytesToHex)
+ * 8. Generate a random BigInteger within the given range (RandomBigInteger)
+ * 9. Calculates the first day of the next month (FirstDayOfNextMonth)
+ * 10. Checks if year is leap year (IsLeapYear)
  * @author weiyifan
  *
  */
 public class UtilityKit {
-	public UtilityKit(){
+	
+	/**
+	 * Takes in first day of month and number of days in month to calculate first day of following month
+	 * @param firstdayofmonth
+	 * @param daysinmonth
+	 * @return
+	 */
+	public static int FirstDayOfNextMonth(int firstdayofmonth, int daysinmonth){
+		
+		int day = daysinmonth%7+firstdayofmonth;
+		
+		if(day>7){
+			return day - 7;
+		}
+		else{
+			return day;
+		}
+	}
+	
+	/**
+	 * Checks if year is a leap year
+	 * @param year
+	 * @return
+	 */
+	public static boolean IsLeapYear(int year){
+		//If year is a century and is not divisible by 400
+		if((year%100==0) && (year%400!=0)){
+			return false;
+		}
+		//If year is a century and divisible by 400
+		else if((year%100==0) && (year%400==0)){
+			return true;
+		}
+		//If year is divisible by 4
+		else if(year%4==0){
+			return true;
+		}
+		//Else not leap year
+		else{
+			return false;
+		}
+	}
+	
+	/**
+	 * Generate a random Big Integer within the range of min<n<(2^maxbits)-1
+	 * @param minvalue
+	 * @param maxbits
+	 * @return
+	 */
+	public static BigInteger RandomBigInteger(BigInteger min, int maxbits){
+		
+		//Random generator
+		Random random = new Random();
+		
+		//Calculate the upper limit
+		BigInteger upperlimit = BigInteger.valueOf(2);
+		upperlimit = upperlimit.pow(maxbits);
+		upperlimit = upperlimit.subtract(BigInteger.ONE);
+		
+		//Loop continues until random BigInteger is lower than upperlimit
+		while(true){
+			BigInteger randomint = new BigInteger(maxbits, random);
+			
+			//Adds min range to random BigInteger as default lowest possible value is 0
+			randomint = randomint.add(min);
+			
+			//Return random BigInteger and end loop if it is within specific range
+			if(randomint.compareTo(upperlimit) != 1){
+				return randomint;
+			}
+		}
 	}
 	
 	public static String readfile(String filename) throws FileNotFoundException{
@@ -41,7 +116,7 @@ public class UtilityKit {
 	}
 	
 	//Due to issues on java 7, you might need to use  string.replaceAll("toreplace", "replaceto") to clear out as many unwanted symbols as possible before using delimiter;
-	public static List<String> stringtolistbydelimiter (String content, String delimiter){
+	public static List<String> StringToListByDelimiter (String content, String delimiter){
 		List<String> list = Arrays.asList(content.split(delimiter));
 		return list;
 	}
@@ -81,4 +156,15 @@ public class UtilityKit {
 	    String result = string.toString();
 	    return result;
 	}
+	
+	/**
+	 * Converts byte array to hexadecimal
+	 * @param bytes
+	 * @return
+	 */
+	public static String BytesToHex(byte[] bytes) {
+        StringBuffer result = new StringBuffer();
+        for (byte b : bytes) result.append(Integer.toString((b & 0xFF) + 0x100, 16).substring(1));
+        return result.toString();
+    }
 }

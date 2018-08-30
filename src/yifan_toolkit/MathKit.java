@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -22,9 +23,9 @@ import java.util.List;
  * 4. Permutations calculator (npr)
  * 
  * Large calculations
- * 1. Sum of all integers in a list (sumlist)
+ * 1. Sum of all BigIntegers in a list (SumList)
  * 2. Square root function for BigDecimal (BigDecimalsqrt) 
- * 3. Factorial (factorial)
+ * 3. Factorial (Factorial)
  * 
  * Graphs
  * 1. Calculates 2 dimensional Euclidean distance for big integer (BigIntTwoDEuclideanDist)
@@ -32,39 +33,45 @@ import java.util.List;
  * 3. Formulate the gradient and y-intercept of linear equation based on 2 points on graph for BigInteger (GraphLinearEquationMNCBigInt)
  * 4. Formulate the gradient and y-intercept of linear equation based on 2 points on graph for double (GraphLinearEquationMNCDouble)
  * 5. Calculate the perpendicular distance between an edge represented by 2 points to a certain point. Inputs and outputs are of type Double (PerpendicularDistDouble)
- * 6. Checks if 2 edges intersect (IfEdgesIntersect)
+ * 6. Checks if 2 edges cross intersect (IfEdgesCrossIntersect)
+ * 7. Checks if 2 edges parallel intersect (IfEdgesParallelIntersect)
  * 
  * Investigation of a number
- * 1. Checks if number is prime (isPrime)
+ * 1. Checks if number is prime (IsPrime)
  * 2. Finds the largest prime factor of a number (largestprime)
  * 3. Finds the number of decimal places of a number (decimalplaces)
  * 4. Checks the number of digits in a number (digits)
- * 5. Finds all factors of a number (allfactors)
+ * 5. Finds all factors of a number (AllFactors)
  * 6. Greatest common multiplier of 2 numbers (GreatestCommonMultiplier)
  * 
  * Calculation for scientific purposes
  * 1. Cantor pairing function, uniquely encode 2 natural numbers into a single natural number (pairingfunction)
  * 
+ * Number Theory
+ * 1. Brute force Amicable Pair generator (AmicableNumbers)
+ * 
  * @author weiyifan
  */
 public class MathKit {
 	
+	static HashMap <BigInteger, Boolean> memoize = new HashMap <BigInteger, Boolean>();
+	
 	/**
-	 * 
+	 * Summation of all BigIntegers in list
 	 * @param l
 	 * @return
 	 */
-	public BigInteger sumlist(@SuppressWarnings("rawtypes") List l){
+	public static BigInteger SumList(List<BigInteger> l){
 		int count = 0;
 		BigInteger sum = new BigInteger("0");
 		while(count<l.size()){
-			sum = sum.add(new BigInteger(String.valueOf(l.get(count))));
+			sum = sum.add(l.get(count));
 			count++;
 		}
 		return sum;
 	}
 	
-	public boolean isPrime(BigInteger n) {
+	public static boolean IsPrime(BigInteger n) {
 	    //check if n is a multiple of 2, and also not equals to 2
 	    if (n.mod(new BigInteger("2")).equals(new BigInteger("0")) && !n.equals(new BigInteger("2"))) {
 	    	return false;
@@ -191,7 +198,7 @@ public class MathKit {
 		return result;
 	}
 	
-	public static BigInteger factorial(BigInteger n){
+	public static BigInteger Factorial(BigInteger n){
 		BigInteger answer = BigInteger.ONE;
 		while(n.compareTo(BigInteger.ONE) == 1){
 			answer = answer.multiply(n);
@@ -201,16 +208,16 @@ public class MathKit {
 	}
 	
 	public BigInteger ncr(int n, int r){
-		BigInteger nfactorial = (factorial(BigInteger.valueOf(n)));
-		BigInteger rfactorial = (factorial(BigInteger.valueOf(r)));
-		BigInteger nminusrfactorial = (factorial(BigInteger.valueOf(n-r)));
+		BigInteger nfactorial = (Factorial(BigInteger.valueOf(n)));
+		BigInteger rfactorial = (Factorial(BigInteger.valueOf(r)));
+		BigInteger nminusrfactorial = (Factorial(BigInteger.valueOf(n-r)));
 		return nfactorial.divide(rfactorial.multiply(nminusrfactorial));
 	}
 	
 	//List can be any numeric types. It does not work for BigInteger or objects. Refer to comment in code on how to edit for those cases
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public BigInteger nprnorepeatnumeric(List list){
-		BigInteger nfactorial = factorial(BigInteger.valueOf(list.size()));
+		BigInteger nfactorial = Factorial(BigInteger.valueOf(list.size()));
 		List<BigInteger> listofdivisors = new ArrayList();
 		for(int i=0;i<list.size();i++){
 			BigInteger divisor = BigInteger.ONE;
@@ -221,7 +228,7 @@ public class MathKit {
 					c--;
 				}
 			}
-			listofdivisors.add(factorial(divisor));
+			listofdivisors.add(Factorial(divisor));
 		}
 		BigInteger answer = nfactorial;
 		for(int i=0;i<listofdivisors.size();i++){
@@ -411,7 +418,7 @@ public class MathKit {
 	 * @param input: Number whose factors are to be found
 	 * @return
 	 */
-	public static List<BigInteger> allfactors(BigInteger input){
+	public static List<BigInteger> AllFactors(BigInteger input){
 		
 		//subdivisors stores all base divisor values into a list (eg 64=2,2,2,2,2,2)
 		List<BigInteger> subdivisors = new ArrayList<BigInteger>();
@@ -456,8 +463,8 @@ public class MathKit {
 	}
 	
 	public static BigInteger npr(int n, int r){
-		BigInteger nfactorial = (factorial(BigInteger.valueOf(n)));
-		BigInteger nminusrfactorial = (factorial(BigInteger.valueOf(n-r)));
+		BigInteger nfactorial = (Factorial(BigInteger.valueOf(n)));
+		BigInteger nminusrfactorial = (Factorial(BigInteger.valueOf(n-r)));
 		return nfactorial.divide(nminusrfactorial);
 	}
 	
@@ -488,7 +495,7 @@ public class MathKit {
 	}
 	
 	/**
-	 * This function checks if 2 edges intersect. Note that intersect is NOT counted if edge 1 touches edge 2 with its tip.
+	 * This function checks if 2 edges intersect by running along one another. Note that intersect is NOT counted if edge 1 touches edge 2 with its tip only.
 	 * e1 stands for edge 1, and e2 stands for edge 2
 	 * Inputs are start and end points of both edges, with x and y representing their coordinates
 	 * @param e1x1
@@ -501,7 +508,53 @@ public class MathKit {
 	 * @param e2y2
 	 * @return
 	 */
-	public static boolean IfEdgesIntersect(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
+	public static boolean IfEdgesParallelIntersect(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
+		List<List<Double>> e1MNC = MathKit.GraphLinearEquationMNCDouble(e1x1, e1y1, e1x2, e1y2);
+		List<List<Double>> e2MNC = MathKit.GraphLinearEquationMNCDouble(e2x1, e2y1, e2x2, e2y2);
+		
+		//If both edges have the same linear equation
+		if(
+		   (e1MNC.get(0).get(0).equals(e2MNC.get(0).get(0))) &&
+		   (e1MNC.get(0).get(1).equals(e2MNC.get(0).get(1))) &&
+		   (e1MNC.get(1).get(0).equals(e2MNC.get(1).get(0))) &&
+		   (e1MNC.get(1).get(1).equals(e2MNC.get(1).get(1)))
+		  ){
+			//If one point of either edge lies between (both vertically and horizontally) both points on the other edge
+			if(
+			    (
+				(((e2x1<e1x1) && (e1x1<e2x2)) && ((e2y1<e1y1) && (e1y1<e2y2))) ||
+			    (((e2x1<e1x1) && (e1x1<e2x2)) && ((e2y1>e1y1) && (e1y1>e2y2))) ||	
+			    (((e2x1>e1x1) && (e1x1>e2x2)) && ((e2y1<e1y1) && (e1y1<e2y2))) ||
+			    (((e2x1>e1x1) && (e1x1>e2x2)) && ((e2y1>e1y1) && (e1y1>e2y2)))
+			    ) || (
+			    (((e2x1<e1x2) && (e1x2<e2x2)) && ((e2y1<e1y2) && (e1y2<e2y2))) ||
+			    (((e2x1<e1x2) && (e1x2<e2x2)) && ((e2y1>e1y2) && (e1y2>e2y2))) ||	
+			    (((e2x1>e1x2) && (e1x2>e2x2)) && ((e2y1<e1y2) && (e1y2<e2y2))) ||
+			    (((e2x1>e1x2) && (e1x2>e2x2)) && ((e2y1>e1y2) && (e1y2>e2y2)))
+			    )
+			    )
+				{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * This function checks if 2 edges cross intersect. Note that intersect is NOT counted if edge 1 touches edge 2 with its tip only.
+	 * e1 stands for edge 1, and e2 stands for edge 2
+	 * Inputs are start and end points of both edges, with x and y representing their coordinates
+	 * @param e1x1
+	 * @param e1y1
+	 * @param e1x2
+	 * @param e1y2
+	 * @param e2x1
+	 * @param e2y1
+	 * @param e2x2
+	 * @param e2y2
+	 * @return
+	 */
+	public static boolean IfEdgesCrossIntersect(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
 		List<List<Double>> e1MNC = MathKit.GraphLinearEquationMNCDouble(e1x1, e1y1, e1x2, e1y2);
 		List<List<Double>> e2MNC = MathKit.GraphLinearEquationMNCDouble(e2x1, e2y1, e2x2, e2y2);
 
@@ -597,5 +650,60 @@ public class MathKit {
 			
 			return false;
 		}
+	}
+	
+	/**
+	 * Returns a list of amicable numbers, where both numbers are within the specified upper limit
+	 * @param limit
+	 * @return
+	 */
+	public static List<String> AmicableNumbers(BigInteger limit){
+
+		//Clears memoize list
+		memoize.clear();
+		
+		List<String> pairs = new ArrayList<String>();
+		
+		BigInteger i = BigInteger.valueOf(2);
+		
+		//While number to be checked is below the limit
+		while (i.compareTo(limit)==-1){
+			
+			//If number has yet to be checked
+			if(memoize.get(i) == null){
+				
+				//Finds all factors of the number
+				List<BigInteger> firstintfactors = MathKit.AllFactors(i);
+	        
+	        	//Number removes itself from its list of factors
+	        	firstintfactors.remove(firstintfactors.size()-1);
+	        
+	        	//Finds the sum of factors of the first number
+	        	BigInteger firstintfactorssum = MathKit.SumList(firstintfactors);
+	        
+	        	//Finds all factors of the sum of the number's factors
+	        	List<BigInteger> secondintfactors = MathKit.AllFactors(firstintfactorssum);
+
+	        	//Number removes itself from its list of factors
+	        	secondintfactors.remove(secondintfactors.size()-1);
+	        
+	        	//Finds the sum of factors of the number's factors
+	        	BigInteger secondintfactorssum = MathKit.SumList(secondintfactors);
+	        
+	        	//If SumOfFactors(A) = B and SumOfFactors(B) = A (Condition 1)
+	        	//If sum of factors of number does not equal to itself (Condition 2)
+	        	if(secondintfactorssum.compareTo(i)==0 && i.compareTo(firstintfactorssum) != 0){
+	        		memoize.put(i, true);
+	        		memoize.put(firstintfactorssum, true);
+	        		String pair = i + " " + firstintfactorssum;
+	        		pairs.add(pair);
+	        	}
+			}
+			
+	        //Increment number by one
+	        i = i.add(BigInteger.ONE);
+		} 
+		
+		return pairs;
 	}
 }
