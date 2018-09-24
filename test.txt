@@ -1,8 +1,7 @@
-1 1 2
-2 2 2
-3 7 6
-4 100 100
-5 1 4
-6 1 8
-7 100 1
-8 1 100
+5 5 3
+hello help high
+p a b h m
+f h e c p
+o i l l h
+b g h o n
+h x c m l

@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -14,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -24,8 +26,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
 
+import test_objects.memoize;
+import test_objects.node;
 import test_programs.TSPBruteForceControl;
 import test_programs.TSPOptimizer;
+import yifan_toolkit.AlgoKit;
 import yifan_toolkit.MathKit;
 import yifan_toolkit.UtilityKit;
 
@@ -34,76 +39,68 @@ public class testground{
 	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {		
 		
-		//Brute force technique deployed as a control
-		//long startTime = System.currentTimeMillis();
-		//TSPBruteForceControl.run();
-		//System.out.println("COMPLETE: Total time taken is " +(System.currentTimeMillis() - startTime)+" milliseconds");
+		long maxprime = 0;
+		double answer = 0;
 		
-		//TSP optimizer
-		//long startTime = System.currentTimeMillis();
-		//TSPOptimizer.run();
-		//System.out.println("COMPLETE: Total time taken is " +(System.currentTimeMillis() - startTime)+" milliseconds");
+		System.out.println(CountPrime(-999,-999));
 		
-		/**
-		 * Project euler qns23, Non-Abundant Sums
-		 */
-		
-		List<Integer> AbundantNumbers = new ArrayList<Integer>();
-		
-		//Generate all abundant numbers from 1 to 28124
-		for(int i = 2;i<28124;i++){
-			
-			//Generate all factors of the number
-			List<BigInteger> factors = MathKit.AllFactors(BigInteger.valueOf(i));
-			
-			//Remove the number itself from the list of its factors
-			factors.remove(factors.size()-1);
-			
-			//Calculate the sum of the factors
-			BigInteger factorsum = MathKit.SumList(factors);
-			
-			//Check if number is an abundant number
-			if(factorsum.intValue() > i){
-				//If yes, add number to list of abundant numbers
-				AbundantNumbers.add(i);
+		for(int a=-999;a<1000;a++){
+			for(int b=-1000;b<=1000;b++){
+				long totalprimes = CountPrime(a,b);
+				long totalprimesneg = CountPrimeNegativeN(a,b);
+				if(totalprimes<totalprimesneg){
+					totalprimes = totalprimesneg;
+				}
+				if(totalprimes>maxprime){
+					maxprime = totalprimes;
+					answer = a*b;
+					System.out.println("Highest number of consecutive primes found: "+maxprime);
+					System.out.println("a is: "+a);
+					System.out.println("b is: "+b);
+					System.out.println("Current answer: "+answer);
+				}
 			}
 		}
 		
-		//Sort abundant numbers in ascending order
-		Collections.sort(AbundantNumbers);
+		System.out.println("Final answer: "+answer);
+	}
+	
+	public static long CountPrime(int x, int y){
 		
-		List<BigInteger> antiabundantsum = new ArrayList<BigInteger>();
+		long count = 0;
 		
-		boolean pass = true;
+		//Initial run
+		BigInteger n2 = BigInteger.valueOf(count*count);
+		BigInteger an = BigInteger.valueOf(count*x);
+		BigInteger b = BigInteger.valueOf(y);
 		
-		for(int i = 1; i < 28124;i++){
-			for(int n = 0; n < AbundantNumbers.size(); n++){
-				if(n>i){
-					n = AbundantNumbers.size();
-				}
-				for(int m = n; m < AbundantNumbers.size(); m++){
-					int sum = AbundantNumbers.get(n) + AbundantNumbers.get(m);
-					if(sum == i){
-						pass = false;
-						m = AbundantNumbers.size();
-					}
-					if(sum > i){
-						m = AbundantNumbers.size();
-					}
-				}
-				if(pass == false){
-					n = AbundantNumbers.size();
-				}
-			}
-			if(pass){
-				antiabundantsum.add(BigInteger.valueOf(i));
-			}
-			pass = true;
+		while(MathKit.IsPrime(n2.add(an).add(b))){
+			count++;
+			n2 = BigInteger.valueOf(count*count);
+			an = BigInteger.valueOf(count*x);
+			b = BigInteger.valueOf(y);
 		}
 		
-		System.out.println(AbundantNumbers);
-		System.out.println(antiabundantsum);
-		System.out.println(MathKit.SumList(antiabundantsum));
+		return count;
+	}
+	
+public static long CountPrimeNegativeN(int x, int y){
+		
+		long count = 0;
+		
+		//Initial run
+		BigInteger n2 = BigInteger.valueOf(count*count);
+		BigInteger an = BigInteger.valueOf(count*x);
+		BigInteger b = BigInteger.valueOf(y);
+		
+		while(MathKit.IsPrime(n2.add(an).add(b))){
+			count--;
+			n2 = BigInteger.valueOf(count*count);
+			an = BigInteger.valueOf(count*x);
+			b = BigInteger.valueOf(y);
+		}
+
+		return -count;
 	}
 }
 	

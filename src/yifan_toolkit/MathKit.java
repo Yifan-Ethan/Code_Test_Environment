@@ -72,6 +72,10 @@ public class MathKit {
 	}
 	
 	public static boolean IsPrime(BigInteger n) {
+		//Return false if n is less than 1
+		if(n.compareTo(BigInteger.ONE)==-1){
+			return false;
+		}
 	    //check if n is a multiple of 2, and also not equals to 2
 	    if (n.mod(new BigInteger("2")).equals(new BigInteger("0")) && !n.equals(new BigInteger("2"))) {
 	    	return false;
