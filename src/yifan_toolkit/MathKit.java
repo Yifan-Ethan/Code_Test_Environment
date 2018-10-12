@@ -192,7 +192,7 @@ public class MathKit {
 	    return sqrtNewtonRaphson(c, xn1, precision, SQRT_DIG);
 	}
 	
-	public BigInteger pairingfunction(BigInteger a, BigInteger b){
+	public static BigInteger pairingfunction(BigInteger a, BigInteger b){
 		BigInteger result = BigInteger.ZERO;
 		result = a.add(b);
 		result = result.add(BigInteger.ONE);

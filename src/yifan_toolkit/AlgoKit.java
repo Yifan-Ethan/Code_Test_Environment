@@ -35,6 +35,7 @@ import test_objects.object1;
  * 3. Find all combinations within a set of elements, while excluding repeated combinations due to repeated elements (combinationsnorepeat)
  * 4. Find all permutations within a set of elements (permutations)
  * 5. Find all permutations within a set of elements, while excluding repeated elements (permutationsnorepeat)
+ * 6. Find all combinations whose elements sum up to a certain value (CombinationSum)
  * 
  * Path Finding
  * 1. Given a specified distance, find all possible routes from start point to end point (numberofpaths)
@@ -45,15 +46,8 @@ import test_objects.object1;
  */
 
 public class AlgoKit {
-	
-	//Fixed variables, DO NOT TOUCH THESE EXCEPT FOR DEBUGGING
-	static MathKit k1 = new MathKit();
-	static UtilityKit k2 = new UtilityKit();
-	static HashMap <BigInteger, BigInteger> memoizelist = new HashMap <BigInteger, BigInteger>();
-	@SuppressWarnings("rawtypes")
-	static HashMap <String, List> permutelist = new HashMap <String, List>();
-	@SuppressWarnings("rawtypes")
-	static HashMap <String, List> combilist = new HashMap <String, List>();
+
+	//Initialize dynamic programming
 	static memoize memoize = new memoize();
 	
 	public AlgoKit(){
@@ -215,17 +209,21 @@ public class AlgoKit {
 	//Initialization
 	//Run this function to begin the algorithm. Do not run algorithm using the "recursion" version of the function
 	public static BigInteger CombinationalMultiplicationOptimizationDynamicProgramming(List<BigInteger> l, BigInteger capacity){
+		
+		//Prepare dynamic programming
+		memoize.clearmemoize();
+		
 		return CombinationalMultiplicationOptimizationDynamicProgramming(l, 0, capacity, BigInteger.ONE);
 	}
 	
 	//Recursion
 	public static BigInteger CombinationalMultiplicationOptimizationDynamicProgramming(List<BigInteger> l, int index, BigInteger capacity, BigInteger weight){
-		if(memoizelist.get(k1.pairingfunction(weight, BigInteger.valueOf(index))) != null){		//Skip computation if results have already been computed during previous recursion
-			if(weight.multiply(memoizelist.get(k1.pairingfunction(weight, BigInteger.valueOf(index)))).compareTo(capacity) == 1){	//Skip current index if weight exceeds capacity
+		if(memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index))) != null){		//Skip computation if results have already been computed during previous recursion
+			if(weight.multiply((BigInteger) memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index)))).compareTo(capacity) == 1){	//Skip current index if weight exceeds capacity
 				return BigInteger.ONE;
 			}
 			else{
-				return memoizelist.get(k1.pairingfunction(weight, BigInteger.valueOf(index)));
+				return (BigInteger) memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index)));
 			}
 		} 
 		else{
@@ -245,7 +243,7 @@ public class AlgoKit {
 				else{
 					result = dump2;
 				}
-				memoizelist.put(k1.pairingfunction(weight, BigInteger.valueOf(index)), result);
+				memoize.addkeyvaluepair(MathKit.pairingfunction(weight, BigInteger.valueOf(index)), result);
 			}
 			return result;
 		}
@@ -262,18 +260,18 @@ public class AlgoKit {
 	//Initialization
 		//Run this function to begin the algorithm. Do not run algorithm using the "recursion" version of the function
 		public static BigInteger CombinationalMultiplicationOptimizationLimitedElementsDynamicProgramming(List<BigInteger> l, BigInteger capacity, int r){
-			memoizelist.clear();
+			memoize.clearmemoize();
 			return CombinationalMultiplicationOptimizationLimitedElementsDynamicProgramming(l, 0, capacity, BigInteger.ONE, r, 0);
 		}
 		
 		//Recursion
 		public static BigInteger CombinationalMultiplicationOptimizationLimitedElementsDynamicProgramming(List<BigInteger> l, int index, BigInteger capacity, BigInteger weight, int r, int numberofelements){
-			if(memoizelist.get(k1.pairingfunction(weight, BigInteger.valueOf(index))) != null){		//Skip computation if results have already been computed during previous recursion
-				if(weight.multiply(memoizelist.get(k1.pairingfunction(weight, BigInteger.valueOf(index)))).compareTo(capacity) == 1){	//Skip current index if weight exceeds capacity
+			if(memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index))) != null){		//Skip computation if results have already been computed during previous recursion
+				if(weight.multiply((BigInteger) memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index)))).compareTo(capacity) == 1){	//Skip current index if weight exceeds capacity
 					return BigInteger.ONE;
 				}
 				else{
-					return memoizelist.get(k1.pairingfunction(weight, BigInteger.valueOf(index)));
+					return (BigInteger) memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index)));
 				}
 			} 
 			else{
@@ -296,12 +294,12 @@ public class AlgoKit {
 					else{
 						result = dump2;
 					}
-					memoizelist.put(k1.pairingfunction(weight, BigInteger.valueOf(index)), result);
+					memoize.addkeyvaluepair(MathKit.pairingfunction(weight, BigInteger.valueOf(index)), result);
 				}
 				return result;
 			}
 		}
-	
+
 	/**
 	 * Genetic algorithm with 1 parent
 	 * Can use runthroughallnumberofelementsforgeneticalgorithmcombination to test through all possible number of elements in combination to find best combination
@@ -523,6 +521,64 @@ public class AlgoKit {
 		return allcombi;
 	}
 	
+	
+	/**
+	 * This method finds all combinations, whose elements have a total value that matches a specified value
+	 * The logic of this code is based entirely on the naive, iterative method of finding all combinations of a set, by using loop within a loop
+	 * @param r: Total value of each combination
+	 * @param listofelements: All elements of set
+	 */
+	//Initiation
+	@SuppressWarnings("rawtypes")
+	public static List CombinationSum(double r, List<Double> listofelements){
+		
+		//Clear memoize mapping
+		memoize.clearmemoize();
+		
+		//Initialization and start combination search
+		List dump1 = new ArrayList();
+		List dump2 = new ArrayList();
+		List allcombi = CombinationSum(0,r,listofelements,dump1,dump2);
+		return allcombi;
+	}
+	//Recursion
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static List CombinationSum(int index, double r, List<Double> listofelements, List combi, List allcombi){
+		
+		//Base case: last element of the subset
+		if(r==0){	
+			allcombi.add(combi);									
+			return allcombi;
+		}
+		
+		//If overshot
+		if(r<0){
+			return allcombi;
+		}
+		
+		//Each recursion behaves like a loop of its own, and adds the element within its own loop before opening the next loop
+		for(int i=index;i<listofelements.size();i++){							//Iterate through each element within current loop
+			
+			//creates a new subset based on the subset within the current loop and add new element
+			List newcombi = ((List) ((ArrayList) combi).clone());					
+			newcombi.add(listofelements.get(i));									
+			
+			//Create key value for dynamic programming
+			StringBuilder sb = new StringBuilder();
+			for(int n=0;n<newcombi.size();n++){
+				sb.append(newcombi.get(n).toString());
+			}
+			
+			//If this combi have yet to be explored
+			if(memoize.getMemoizelist().get(sb.toString()) == null){
+				memoize.addkeyvaluepair(sb.toString(), sb.toString());
+				allcombi = CombinationSum(i+1,r-listofelements.get(i),listofelements,newcombi,allcombi);		//executes the next loop
+			}
+		}
+		return allcombi;
+	}
+	
+	
 	/**
 	 * The logic of this code is based entirely on the naive, iterative method of finding all combinations of a set, by using loop within a loop
 	 * @param index: Starting element of new loop
@@ -579,7 +635,11 @@ public class AlgoKit {
 	//Initiation
 	@SuppressWarnings("rawtypes")
 	public static List combinationsnorepeat(int r, List listofelements){
-		combilist.clear();
+
+		//Clear memoize mapping
+		memoize.clearmemoize();
+		
+		//Initialization and start combination search
 		List dump1 = new ArrayList();
 		List dump2 = new ArrayList();
 		List allcombi = combinationsnorepeat(0,r,listofelements,dump1,dump2);
@@ -590,30 +650,30 @@ public class AlgoKit {
 	public static List combinationsnorepeat(int index, int r, List listofelements, List combi, List allcombi){
 		
 		//Base case: last element of the subset
-		if(r==1){	
-			for(int i=index;i<listofelements.size()-r+1;i++){			//Iterate through each element within current loop
-				List newcombi = ((List) ((ArrayList) combi).clone());	//creates a new subset based on the subset within the current loop
-				newcombi.add(listofelements.get(i));					//add new element of current loop to subset
-				
-				//Convert permutation to string
-				String key = "";
-				for(int n=0;n<newcombi.size();n++){
-					key = key + newcombi.get(n);
-				}
-				//Add permutation to list if it does not yet exist
-				if(combilist.get(key) == null){
-					allcombi.add(newcombi);									//add completed subset to list of permutations
-					combilist.put(key, newcombi);
-				}
-			}
-			return allcombi;
+		if(r==0){	
+			allcombi.add(combi);									//add completed subset to list of permutations
 		}
 		
-		//Each recursion behaves like a loop of its own, and adds the element within its own loop before opening the next loop
-		for(int i=index;i<listofelements.size()-r+1;i++){							//Iterate through each element within current loop
-			List newcombi = ((List) ((ArrayList) combi).clone());					//creates a new subset based on the subset within the current loop
-			newcombi.add(listofelements.get(i));									//add new element of current loop to subset
-			allcombi = combinationsnorepeat(i+1,r-1,listofelements,newcombi,allcombi);		//executes the next loop
+		else{
+			//Each recursion behaves like a loop of its own, and adds the element within its own loop before opening the next loop
+			for(int i=index;i<listofelements.size()-r+1;i++){							//Iterate through each element within current loop
+			
+				//creates a new subset based on the subset within the current loop, and add new element
+				List newcombi = ((List) ((ArrayList) combi).clone());					
+				newcombi.add(listofelements.get(i));									
+			
+				//Convert permutation to string
+				StringBuilder key = new StringBuilder();
+				for(int n=0;n<newcombi.size();n++){
+					key.append(newcombi.get(n).toString());
+				}
+			
+				//Add permutation to list if it does not yet exist
+				if(memoize.getMemoizelist().get(key.toString()) == null){
+					memoize.addkeyvaluepair(key.toString(), key.toString());
+					allcombi = combinationsnorepeat(i+1,r-1,listofelements,newcombi,allcombi);		//executes the next loop
+				}
+			}
 		}
 		return allcombi;
 	}
@@ -685,7 +745,10 @@ public class AlgoKit {
 	//Initiation
 	@SuppressWarnings("rawtypes")
 	public static List permutationsnorepeat(int r, List listofelements){
-		permutelist.clear();
+
+		//Prepare for dynamic programming
+		memoize.clearmemoize();
+		
 		List dump1 = new ArrayList();
 		List dump2 = new ArrayList();
 		int loops = listofelements.size()-r;
@@ -706,14 +769,14 @@ public class AlgoKit {
 					newpermu.add(listofelements.get(j));
 				
 					//Convert permutation to string
-					String key = "";
+					StringBuilder key = new StringBuilder();
 					for(int n=0;n<newpermu.size();n++){
-						key = key + newpermu.get(n);
+						key.append(newpermu.get(n).toString());
 					}
 					//Add permutation to list if it does not yet exist
-					if(permutelist.get(key) == null){
+					if(memoize.getMemoizelist().get(key.toString()) == null){
 						allpermu.add(newpermu);									//add completed subset to list of permutations
-						permutelist.put(key, newpermu);
+						memoize.addkeyvaluepair(key.toString(), newpermu);
 					}
 				
 					List newpermutwo = ((List) ((ArrayList) permu).clone());	
@@ -721,14 +784,14 @@ public class AlgoKit {
 					newpermutwo.add(listofelements.get(i));
 
 					//Convert permutation to string
-					key = "";
+					key.setLength(0);
 					for(int n=0;n<newpermutwo.size();n++){
-						key = key + newpermutwo.get(n);
+						key.append(newpermutwo.get(n).toString());
 					}
 					//Add permutation to list if it does not yet exist
-					if(permutelist.get(key) == null){
+					if(memoize.getMemoizelist().get(key.toString()) == null){
 						allpermu.add(newpermutwo);									//add completed subset to list of permutations
-						permutelist.put(key, newpermutwo);
+						memoize.addkeyvaluepair(key.toString(), newpermutwo);
 					}
 				}
 			}

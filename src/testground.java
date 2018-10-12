@@ -39,68 +39,61 @@ public class testground{
 	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {		
 		
-		long maxprime = 0;
-		double answer = 0;
+		//Configuration
+		double pence = 200;
 		
-		System.out.println(CountPrime(-999,-999));
+		List<Double> l = new ArrayList<Double>();
 		
-		for(int a=-999;a<1000;a++){
-			for(int b=-1000;b<=1000;b++){
-				long totalprimes = CountPrime(a,b);
-				long totalprimesneg = CountPrimeNegativeN(a,b);
-				if(totalprimes<totalprimesneg){
-					totalprimes = totalprimesneg;
-				}
-				if(totalprimes>maxprime){
-					maxprime = totalprimes;
-					answer = a*b;
-					System.out.println("Highest number of consecutive primes found: "+maxprime);
-					System.out.println("a is: "+a);
-					System.out.println("b is: "+b);
-					System.out.println("Current answer: "+answer);
-				}
-			}
+		//1 pence
+		for(int i=0;i<(pence/1);i++){
+			l.add((double) 1);
 		}
 		
-		System.out.println("Final answer: "+answer);
-	}
-	
-	public static long CountPrime(int x, int y){
-		
-		long count = 0;
-		
-		//Initial run
-		BigInteger n2 = BigInteger.valueOf(count*count);
-		BigInteger an = BigInteger.valueOf(count*x);
-		BigInteger b = BigInteger.valueOf(y);
-		
-		while(MathKit.IsPrime(n2.add(an).add(b))){
-			count++;
-			n2 = BigInteger.valueOf(count*count);
-			an = BigInteger.valueOf(count*x);
-			b = BigInteger.valueOf(y);
+		//2 pence
+		for(int i=0;i<(pence/2);i++){
+			l.add((double) 2);
 		}
 		
-		return count;
-	}
-	
-public static long CountPrimeNegativeN(int x, int y){
-		
-		long count = 0;
-		
-		//Initial run
-		BigInteger n2 = BigInteger.valueOf(count*count);
-		BigInteger an = BigInteger.valueOf(count*x);
-		BigInteger b = BigInteger.valueOf(y);
-		
-		while(MathKit.IsPrime(n2.add(an).add(b))){
-			count--;
-			n2 = BigInteger.valueOf(count*count);
-			an = BigInteger.valueOf(count*x);
-			b = BigInteger.valueOf(y);
+		//5 pence
+		for(int i=0;i<(pence/5);i++){
+			l.add((double) 5);
 		}
+		
+		//10 pence
+		for(int i=0;i<(pence/10);i++){
+			l.add((double) 10);
+		}
+		
+		//20 pence
+		for(int i=0;i<(pence/20);i++){
+			l.add((double) 20);
+		}
+		
+		//50 pence
+		for(int i=0;i<(pence/50);i++){
+			l.add((double) 50);
+		}
+		
+		//100 pence
+		for(int i=0;i<(pence/100);i++){
+			l.add((double) 100);
+		}
+		
+		//200 pence
+		for(int i=0;i<(pence/200);i++){
+			l.add((double) 200);
+		}
+		
+		//Algorithm: Given the total sum of all elements, find all combinations that satisfy total sum
+		//STACK OVERFLOW!
+		List answer = AlgoKit.CombinationSum(pence, l);
 
-		return -count;
+		//Output all combis to console screen
+		for(int i=0;i<answer.size();i++){
+			System.out.println(answer.get(i));
+		}
+		
+		System.out.println(answer.size());
 	}
 }
 	
