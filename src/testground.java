@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import test_objects.memoize;
 import test_objects.node;
@@ -39,61 +40,93 @@ public class testground{
 	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {		
 		
+		/**
+		 * Problem 32: Pandigital products
+		 * Create a list of elements, ranging from 1 to 9
+		 * Each permutation of possible multiplicand/multiplier/product identity consists of 3 sequences
+		 * A lot of sequences will be invalid as a 1 digit number multiplied by a 2 digit number will never result in a 6 digit number
+		 * There is only 1 valid set of permutations: 2 digits * 3 digits = 4 digits
+		 */
+		
 		//Configuration
-		double pence = 200;
+		double s1 = 2;
+		double s2 = 3;
 		
-		List<Double> l = new ArrayList<Double>();
+		long answer = 0;
+		HashMap<Long, Boolean> trackanswers = new HashMap<Long, Boolean>();
+		List<Long> e = new ArrayList<Long>();
 		
-		//1 pence
-		for(int i=0;i<(pence/1);i++){
-			l.add((double) 1);
+		//Add elements to list
+		for(long i=1;i<=9;i++){
+			e.add(i);
 		}
 		
-		//2 pence
-		for(int i=0;i<(pence/2);i++){
-			l.add((double) 2);
-		}
-		
-		//5 pence
-		for(int i=0;i<(pence/5);i++){
-			l.add((double) 5);
-		}
-		
-		//10 pence
-		for(int i=0;i<(pence/10);i++){
-			l.add((double) 10);
-		}
-		
-		//20 pence
-		for(int i=0;i<(pence/20);i++){
-			l.add((double) 20);
-		}
-		
-		//50 pence
-		for(int i=0;i<(pence/50);i++){
-			l.add((double) 50);
-		}
-		
-		//100 pence
-		for(int i=0;i<(pence/100);i++){
-			l.add((double) 100);
-		}
-		
-		//200 pence
-		for(int i=0;i<(pence/200);i++){
-			l.add((double) 200);
-		}
-		
-		//Algorithm: Given the total sum of all elements, find all combinations that satisfy total sum
-		//STACK OVERFLOW!
-		List answer = AlgoKit.CombinationSum(pence, l);
+		//2 * 3 = 4 digits
+		List<List<Long>> firstmultiplicand = AlgoKit.permutations(2, e);
+		List<List<Long>> secondmultiplicand = AlgoKit.permutations(3, e);
+		List<List<Long>> answers = AlgoKit.permutations(4, e);
 
-		//Output all combis to console screen
-		for(int i=0;i<answer.size();i++){
-			System.out.println(answer.get(i));
+		HashMap<Long, Boolean> indexanswers = new HashMap<Long, Boolean>();
+		
+		for(int i=0;i<answers.size();i++){
+			indexanswers.put(Long.parseLong(UtilityKit.ListToString(answers.get(i))), true);
 		}
 		
-		System.out.println(answer.size());
+		for(int i=0;i<firstmultiplicand.size();i++){
+			for(int j=0;j<secondmultiplicand.size();j++){
+				
+				long m1 = Long.parseLong(UtilityKit.ListToString(firstmultiplicand.get(i)));
+				long m2 = Long.parseLong(UtilityKit.ListToString(secondmultiplicand.get(j)));
+				
+				//Check if 1st multiplicand * 2nd multiplicand == one of the answers
+				if(indexanswers.get(m1*m2)!=null){
+					
+					String m1string = String.valueOf(m1);
+					String m2string = String.valueOf(m2);
+					String ansstring = String.valueOf(m1*m2);
+					String Pandigitalcheck = m1string + m2string + ansstring;		
+					if(UtilityKit.ContainsAllChars(Pandigitalcheck,"123456789"))
+				    {
+						if(trackanswers.get(m1*m2) == null){
+				        	answer = answer + (m1*m2);
+				        	trackanswers.put(m1*m2, true);
+				        }
+				    }
+				}
+			}
+		}
+		
+		
+		//1 * 4 = 4 digits
+		firstmultiplicand = AlgoKit.permutations(1, e);
+		secondmultiplicand = (List<List<Long>>) ((ArrayList) answers).clone();
+		
+		for(int i=0;i<firstmultiplicand.size();i++){
+			for(int j=0;j<secondmultiplicand.size();j++){
+				
+				long m1 = Long.parseLong(UtilityKit.ListToString(firstmultiplicand.get(i)));
+				long m2 = Long.parseLong(UtilityKit.ListToString(secondmultiplicand.get(j)));
+				
+				//Check if 1st multiplicand * 2nd multiplicand == one of the answers
+				if(indexanswers.get(m1*m2)!=null){
+					
+					String m1string = String.valueOf(m1);
+					String m2string = String.valueOf(m2);
+					String ansstring = String.valueOf(m1*m2);
+					String Pandigitalcheck = m1string + m2string + ansstring;		
+					if(UtilityKit.ContainsAllChars(Pandigitalcheck,"123456789"))
+				    {
+						if(trackanswers.get(m1*m2) == null){
+				        	answer = answer + (m1*m2);
+				        	trackanswers.put(m1*m2, true);
+				        }
+				    }
+				}
+			}
+		}
+		
+		
+		System.out.println(answer);
 	}
 }
 	

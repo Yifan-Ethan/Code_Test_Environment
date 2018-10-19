@@ -26,6 +26,7 @@ import java.util.List;
  * 1. Sum of all BigIntegers in a list (SumList)
  * 2. Square root function for BigDecimal (BigDecimalsqrt) 
  * 3. Factorial (Factorial)
+ * 4. Multiply all doubles in a list (MultiplyList)
  * 
  * Graphs
  * 1. Calculates 2 dimensional Euclidean distance for big integer (BigIntTwoDEuclideanDist)
@@ -62,13 +63,19 @@ public class MathKit {
 	 * @return
 	 */
 	public static BigInteger SumList(List<BigInteger> l){
-		int count = 0;
 		BigInteger sum = new BigInteger("0");
-		while(count<l.size()){
-			sum = sum.add(l.get(count));
-			count++;
+		for(int i=0;i<l.size();i++){
+			sum = sum.add(l.get(i));
 		}
 		return sum;
+	}
+	
+	public static double MultiplyList(List<Double> l){
+		double total = 1;
+		for(int i=0;i<l.size();i++){
+			total = total * l.get(i);
+		}
+		return total;
 	}
 	
 	public static boolean IsPrime(BigInteger n) {

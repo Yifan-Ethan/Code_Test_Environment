@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
+
 import javax.swing.JFileChooser;
 
 /**
@@ -15,20 +18,53 @@ import javax.swing.JFileChooser;
  * This is to ensure that code logic can be easily understood, and easily transferred to a new language
  * This class contains
  * 
+ * String/Text/Output related functions
  * 1. Read all contents from a txt file, returns a string (readfile)
  * 2. Add contents of string to list by delimiter (stringtolistbydelimiter)
  * 3. Count number of lines in a string (countLines)
  * 4. Read all contents from a txt file, with window to choose file (choosereadfile)
- * 5. Generate a random number from a given range (randomnumbergenerator)
- * 6. Generate a random string of characters with the specified length (randomstring)
- * 7. Converts a byte array to hexadecimal (BytesToHex)
- * 8. Generate a random BigInteger within the given range (RandomBigInteger)
- * 9. Calculates the first day of the next month (FirstDayOfNextMonth)
- * 10. Checks if year is leap year (IsLeapYear)
+ * 5. Generate a random string of characters with the specified length (randomstring)
+ * 6. Converts elements in a list into string based on its existing order (ListToString)
+ * 7. Checks if string contains all characters in substring (ContainsAllChars)
+ * 
+ * Number related functions
+ * 1. Generate a random number from a given range (randomnumbergenerator)
+ * 2. Generate a random BigInteger within the given range (RandomBigInteger)
+ * 
+ * Data conversion
+ * 1. Converts a byte array to hexadecimal (BytesToHex)
+ * 
+ * Misc
+ * 1. Calculates the first day of the next month (FirstDayOfNextMonth)
+ * 2. Checks if year is leap year (IsLeapYear)
  * @author weiyifan
  *
  */
 public class UtilityKit {
+	
+	//s is string to be checked, chars is string containing all characters that need to be in s
+	public static boolean ContainsAllChars (String s, String chars) {
+		
+		Set<Character> sset = new HashSet<>();
+	    for (char c : s.toCharArray()) {
+	        sset.add(c);
+	    }
+	    
+	    Set<Character> charsset = new HashSet<>();
+	    for (char c : chars.toCharArray()) {
+	    	charsset.add(c);
+	    }
+		
+		return sset.containsAll(charsset);
+	}
+	
+	public static String ListToString(@SuppressWarnings("rawtypes") List l){
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<l.size();i++){
+			sb.append(l.get(i).toString());
+		}
+		return sb.toString();
+	}
 	
 	/**
 	 * Takes in first day of month and number of days in month to calculate first day of following month

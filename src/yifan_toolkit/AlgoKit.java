@@ -21,9 +21,7 @@ import test_objects.object1;
  * Optimization Algorithms
  * 1. Dual parent Genetic algorithm, catered for permutation optimization with gene repetition (geneticalgorithmpermuation)
  * 2. Single parent Genetic algorithm, catered for permutation optimization without gene repetition (geneticalgorithmsolopermuation)
- * 3. Search tree to optimize multiplication with Dynamic Programming using memoize (CombinationalMultiplicationOptimizationDynamicProgramming) clearmemoizelist() can be used to clear hashmap before using this algorithm
- * 4. Search tree to optimize multiplication for a limited number of products, with Dynamic Programming using memoize (CombinationalMultiplicationOptimizationLimitedElementsDynamicProgramming)
- * 5. Single parent Genetic algorithm, catered for combination optimization without gene repetition (geneticalgorithmcombination)
+ * 3. Single parent Genetic algorithm, catered for combination optimization without gene repetition (geneticalgorithmcombination)
  *
  * Sorting Algorithms
  * 1. Bubblesort (bubblesort)
@@ -43,6 +41,10 @@ import test_objects.object1;
  * Search Algorithms
  * 1. Binary search (binarysearch)
  * @author weiyifan
+ * 
+ * Algorithms pending performance review
+ * 1. Search tree to find optimal combination whose multiplication is the highest and compute its result (CombinationMultiplication) (Revise VS CombinationSum)
+ * 2. Search tree to optimize multiplication for a limited number of products, with Dynamic Programming using memoize (CombinationalMultiplicationOptimizationLimitedElementsDynamicProgramming)
  */
 
 public class AlgoKit {
@@ -199,7 +201,7 @@ public class AlgoKit {
 	}
 	
 	/**
-	 * Combinational optimization dynamic programming, catered specifically towards multiplication
+	 * Given capacity, find optimal combination whose multiplication of elements is the highest and compute it result
 	 * @param l: List of factors to be used for multiplication
 	 * @param capacity: Value at which product does not exceed
 	 * @return Largest product found from a certain combination of factors, and is below capacity value
@@ -208,16 +210,16 @@ public class AlgoKit {
 	
 	//Initialization
 	//Run this function to begin the algorithm. Do not run algorithm using the "recursion" version of the function
-	public static BigInteger CombinationalMultiplicationOptimizationDynamicProgramming(List<BigInteger> l, BigInteger capacity){
+	public static BigInteger CombinationMultiplication(List<BigInteger> l, BigInteger capacity){
 		
 		//Prepare dynamic programming
 		memoize.clearmemoize();
 		
-		return CombinationalMultiplicationOptimizationDynamicProgramming(l, 0, capacity, BigInteger.ONE);
+		return CombinationMultiplication(l, 0, capacity, BigInteger.ONE);
 	}
 	
 	//Recursion
-	public static BigInteger CombinationalMultiplicationOptimizationDynamicProgramming(List<BigInteger> l, int index, BigInteger capacity, BigInteger weight){
+	public static BigInteger CombinationMultiplication(List<BigInteger> l, int index, BigInteger capacity, BigInteger weight){
 		if(memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index))) != null){		//Skip computation if results have already been computed during previous recursion
 			if(weight.multiply((BigInteger) memoize.getMemoizelist().get(MathKit.pairingfunction(weight, BigInteger.valueOf(index)))).compareTo(capacity) == 1){	//Skip current index if weight exceeds capacity
 				return BigInteger.ONE;
@@ -232,11 +234,11 @@ public class AlgoKit {
 				return BigInteger.ONE;
 			}
 			else if(l.get(index).multiply(weight).compareTo(capacity) == 1){	//Skip current index if weight exceeds capacity
-				result = CombinationalMultiplicationOptimizationDynamicProgramming(l,index+1,capacity,weight);
+				result = CombinationMultiplication(l,index+1,capacity,weight);
 			}
 			else{	//return the greater value
-				BigInteger dump1 = CombinationalMultiplicationOptimizationDynamicProgramming(l,index+1,capacity, weight);
-				BigInteger dump2 = l.get(index).multiply(CombinationalMultiplicationOptimizationDynamicProgramming(l,index+1,capacity, l.get(index).multiply(weight)));
+				BigInteger dump1 = CombinationMultiplication(l,index+1,capacity, weight);
+				BigInteger dump2 = l.get(index).multiply(CombinationMultiplication(l,index+1,capacity, l.get(index).multiply(weight)));
 				if(dump1.compareTo(dump2) == 1 || dump1.compareTo(dump2) == 0){
 					result = dump1;
 				}
@@ -571,7 +573,7 @@ public class AlgoKit {
 			
 			//If this combi have yet to be explored
 			if(memoize.getMemoizelist().get(sb.toString()) == null){
-				memoize.addkeyvaluepair(sb.toString(), sb.toString());
+				memoize.addkeyvaluepair(sb.toString(), true);
 				allcombi = CombinationSum(i+1,r-listofelements.get(i),listofelements,newcombi,allcombi);		//executes the next loop
 			}
 		}
@@ -670,7 +672,7 @@ public class AlgoKit {
 			
 				//Add permutation to list if it does not yet exist
 				if(memoize.getMemoizelist().get(key.toString()) == null){
-					memoize.addkeyvaluepair(key.toString(), key.toString());
+					memoize.addkeyvaluepair(key.toString(), true);
 					allcombi = combinationsnorepeat(i+1,r-1,listofelements,newcombi,allcombi);		//executes the next loop
 				}
 			}
@@ -687,13 +689,26 @@ public class AlgoKit {
 	 * @Runtime O(nPr), nPr is the formula for calculating permutation
 	 */
 	//Initiation
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static List permutations(int r, List listofelements){
-		List dump1 = new ArrayList();
-		List dump2 = new ArrayList();
-		int loops = listofelements.size()-r;
-		List allpermu = permutations(r,listofelements,dump1,dump2,loops);
-		return allpermu;
+		
+		//If each permutation only contains 1 element
+		if(r == 1){
+			List permutations = new ArrayList();
+			for(int i=0;i<listofelements.size();i++){
+				List dump = new ArrayList();
+				dump.add(listofelements.get(i));
+				permutations.add(dump);
+			}
+			return permutations;
+		}
+		else{
+			List dump1 = new ArrayList();
+			List dump2 = new ArrayList();
+			int loops = listofelements.size()-r;
+			List allpermu = permutations(r,listofelements,dump1,dump2,loops);
+			return allpermu;
+		}
 	}
 	//Recursion
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -776,7 +791,7 @@ public class AlgoKit {
 					//Add permutation to list if it does not yet exist
 					if(memoize.getMemoizelist().get(key.toString()) == null){
 						allpermu.add(newpermu);									//add completed subset to list of permutations
-						memoize.addkeyvaluepair(key.toString(), newpermu);
+						memoize.addkeyvaluepair(key.toString(), true);
 					}
 				
 					List newpermutwo = ((List) ((ArrayList) permu).clone());	
@@ -791,7 +806,7 @@ public class AlgoKit {
 					//Add permutation to list if it does not yet exist
 					if(memoize.getMemoizelist().get(key.toString()) == null){
 						allpermu.add(newpermutwo);									//add completed subset to list of permutations
-						memoize.addkeyvaluepair(key.toString(), newpermutwo);
+						memoize.addkeyvaluepair(key.toString(), true);
 					}
 				}
 			}
