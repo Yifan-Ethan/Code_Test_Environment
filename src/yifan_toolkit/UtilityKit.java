@@ -1,7 +1,10 @@
 package yifan_toolkit;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,13 +12,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
-
 import javax.swing.JFileChooser;
 
 /**
  * Java scripting tools, catered for utility functionalities
  * Gentle reminder: Code logic should always be simple and easy to read! No complicated logic is allowed in this class file!
  * This is to ensure that code logic can be easily understood, and easily transferred to a new language
+ * Note: Methods with names starting P#_ are methods that work in conjunction with one another. Groups are denoted by #. Eg. P1_CreateDataPacket works with P1_ReceiveData
  * This class contains
  * 
  * String/Text/Output related functions
@@ -33,6 +36,8 @@ import javax.swing.JFileChooser;
  * 
  * Data conversion
  * 1. Converts a byte array to hexadecimal (BytesToHex)
+ * 2. Converts any data type to byte array (P1_CreateDataPacket)
+ * 3. Receives data converted from any type via socket (P1_ReceiveData)
  * 
  * Misc
  * 1. Calculates the first day of the next month (FirstDayOfNextMonth)
@@ -41,6 +46,64 @@ import javax.swing.JFileChooser;
  *
  */
 public class UtilityKit {
+	
+	/**
+	 * Convert any data into byte array
+	 * @param data
+	 * @return
+	 */
+	public static byte[] P1_CreateDataPacket(byte[] data){
+		byte[] packet = null;
+		try{
+			byte[] initialize = new byte[1];
+			initialize[0] = 2;
+			byte[] separator = new byte[1];
+			separator[0] = 4;
+			byte[] data_length = String.valueOf(data.length).getBytes("UTF8");
+			packet = new byte[initialize.length+separator.length+data_length.length+data.length];
+				
+			System.arraycopy(initialize, 0, packet, 0, initialize.length);
+			System.arraycopy(data_length, 0, packet, initialize.length, data_length.length);
+			System.arraycopy(separator, 0, packet, initialize.length+data_length.length, separator.length);
+			System.arraycopy(data, 0, packet, initialize.length+data_length.length+separator.length, data.length);
+		} catch (UnsupportedEncodingException ex){	//Logs if fail
+			//Logger.getLogger(testground.class.getName()).log(Level.SEVERE,null,ex);
+		}
+		return packet;
+	}
+	
+	/**
+	 * Receive data converted from any type into byte array
+	 * @param dis
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] P1_ReceiveData(DataInputStream dis) throws IOException{
+		byte[] initialize = new byte[1];
+		dis.read(initialize, 0, initialize.length);
+		if(initialize[0]==2){
+			byte[] data_buff = null;
+			try{
+				int b = 0;
+				String buff_length = "";
+				while ((b = dis.read()) != 4) {
+					buff_length += (char) b;
+				}
+				int data_length = Integer.parseInt(buff_length);
+				data_buff = new byte[Integer.parseInt(buff_length)];
+				int byte_read = 0;
+				int byte_offset = 0;
+				while(byte_offset<data_length){
+					byte_read = dis.read(data_buff, byte_offset, data_length-byte_offset);
+					byte_offset+=byte_read;
+				}
+			} catch (IOException ex){	//Logs if fail
+				//Logger.getLogger(testground.class.getName()).log(Level.SEVERE,null,ex);
+			}
+			return data_buff;
+		}
+		return null;
+	}
 	
 	//s is string to be checked, chars is string containing all characters that need to be in s
 	public static boolean ContainsAllChars (String s, String chars) {
