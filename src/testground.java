@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import test_objects.Fraction;
 import test_objects.memoize;
 import test_objects.node;
 import test_programs.TSPBruteForceControl;
@@ -35,98 +36,54 @@ import yifan_toolkit.AlgoKit;
 import yifan_toolkit.MathKit;
 import yifan_toolkit.UtilityKit;
 
+public class testground {
 
-public class testground{
-	
-	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {		
-		
+	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {
+
 		/**
-		 * Problem 32: Pandigital products
-		 * Create a list of elements, ranging from 1 to 9
-		 * Each permutation of possible multiplicand/multiplier/product identity consists of 3 sequences
-		 * A lot of sequences will be invalid as a 1 digit number multiplied by a 2 digit number will never result in a 6 digit number
-		 * There is only 1 valid set of permutations: 2 digits * 3 digits = 4 digits
+		 * Problem 33: Digit cancelling fractions The fraction 49/98 is a curious
+		 * fraction, as an inexperienced mathematician in attempting to simplify it may
+		 * incorrectly believe that 49/98 = 4/8, which is correct, is obtained by
+		 * cancelling the 9s. We shall consider fractions like, 30/50 = 3/5, to be
+		 * trivial examples. There are exactly four non-trivial examples of this type of
+		 * fraction, less than one in value, and containing two digits in the numerator
+		 * and denominator. If the product of these four fractions is given in its
+		 * lowest common terms, find the value of the denominator.
 		 */
-		
-		//Configuration
+
+		/**
+		 * Solution decription: Problem pointers: 1. Numerator and denominator both
+		 * contain only 2 digits 2. There exists a total of 4 curious fractions
+		 * 
+		 * Matching conditions for curious fraction: 1. answer1 = cancellation of same
+		 * digit in both numerator and denominator 2. answer2 = simplification of
+		 * fraction 3. answer1 == answer2
+		 * 
+		 * Result 1. To find the product of these 4 fractions, and retrieve value of
+		 * denominator
+		 */
+
+		// CONFIG
 		double s1 = 2;
 		double s2 = 3;
-		
-		long answer = 0;
-		HashMap<Long, Boolean> trackanswers = new HashMap<Long, Boolean>();
-		List<Long> e = new ArrayList<Long>();
-		
-		//Add elements to list
-		for(long i=1;i<=9;i++){
-			e.add(i);
-		}
-		
-		//2 * 3 = 4 digits
-		List<List<Long>> firstmultiplicand = AlgoKit.permutations(2, e);
-		List<List<Long>> secondmultiplicand = AlgoKit.permutations(3, e);
-		List<List<Long>> answers = AlgoKit.permutations(4, e);
 
-		HashMap<Long, Boolean> indexanswers = new HashMap<Long, Boolean>();
-		
-		for(int i=0;i<answers.size();i++){
-			indexanswers.put(Long.parseLong(UtilityKit.ListToString(answers.get(i))), true);
-		}
-		
-		for(int i=0;i<firstmultiplicand.size();i++){
-			for(int j=0;j<secondmultiplicand.size();j++){
-				
-				long m1 = Long.parseLong(UtilityKit.ListToString(firstmultiplicand.get(i)));
-				long m2 = Long.parseLong(UtilityKit.ListToString(secondmultiplicand.get(j)));
-				
-				//Check if 1st multiplicand * 2nd multiplicand == one of the answers
-				if(indexanswers.get(m1*m2)!=null){
-					
-					String m1string = String.valueOf(m1);
-					String m2string = String.valueOf(m2);
-					String ansstring = String.valueOf(m1*m2);
-					String Pandigitalcheck = m1string + m2string + ansstring;		
-					if(UtilityKit.ContainsAllChars(Pandigitalcheck,"123456789"))
-				    {
-						if(trackanswers.get(m1*m2) == null){
-				        	answer = answer + (m1*m2);
-				        	trackanswers.put(m1*m2, true);
-				        }
-				    }
+		List<Fraction> curiousfractions = new ArrayList<Fraction>();
+
+		for (int d = 10; d < 100; d++) {
+			for (int n = 10; n < d; n++) {
+				if (n % 10 != 0 && d % 10 != 0 && n != d) {
+					if (n / 10 == d % 10 || n % 10 == d / 10) {
+						Fraction actual = new Fraction(n, d);
+						Fraction c1 = new Fraction(n / 10, d % 10);
+						Fraction c2 = new Fraction(n % 10, d / 10);
+						if (actual.equals(c1) || actual.equals(c2)) {
+							curiousfractions.add(actual);
+						}
+					}
 				}
 			}
 		}
-		
-		
-		//1 * 4 = 4 digits
-		firstmultiplicand = AlgoKit.permutations(1, e);
-		secondmultiplicand = (List<List<Long>>) ((ArrayList) answers).clone();
-		
-		for(int i=0;i<firstmultiplicand.size();i++){
-			for(int j=0;j<secondmultiplicand.size();j++){
-				
-				long m1 = Long.parseLong(UtilityKit.ListToString(firstmultiplicand.get(i)));
-				long m2 = Long.parseLong(UtilityKit.ListToString(secondmultiplicand.get(j)));
-				
-				//Check if 1st multiplicand * 2nd multiplicand == one of the answers
-				if(indexanswers.get(m1*m2)!=null){
-					
-					String m1string = String.valueOf(m1);
-					String m2string = String.valueOf(m2);
-					String ansstring = String.valueOf(m1*m2);
-					String Pandigitalcheck = m1string + m2string + ansstring;		
-					if(UtilityKit.ContainsAllChars(Pandigitalcheck,"123456789"))
-				    {
-						if(trackanswers.get(m1*m2) == null){
-				        	answer = answer + (m1*m2);
-				        	trackanswers.put(m1*m2, true);
-				        }
-				    }
-				}
-			}
-		}
-		
-		
-		System.out.println(answer);
+
+		System.out.println(curiousfractions);
 	}
 }
-	

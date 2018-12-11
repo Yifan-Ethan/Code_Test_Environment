@@ -43,7 +43,7 @@ import java.util.List;
  * 3. Finds the number of decimal places of a number (decimalplaces)
  * 4. Checks the number of digits in a number (digits)
  * 5. Finds all factors of a number (AllFactors)
- * 6. Greatest common multiplier of 2 numbers (GreatestCommonMultiplier)
+ * 6. Greatest common multiplier of 2 numbers (GreatestCommonDivisor)
  * 
  * Calculation for scientific purposes
  * 1. Cantor pairing function, uniquely encode 2 natural numbers into a single natural number (pairingfunction)
@@ -485,8 +485,8 @@ public class MathKit {
 	 * @param b
 	 * @return
 	 */
-	public static double GreatestCommonMultiplier(double a, double b) {
-	    return b == 0 ? a : GreatestCommonMultiplier(b, a % b); 
+	public static double GreatestCommonDivisor(double a, double b) {
+	    return b == 0 ? a : GreatestCommonDivisor(b, a % b); 
 	}
 	
 	/**
@@ -496,7 +496,7 @@ public class MathKit {
 	 * @return
 	 */
 	public static String Fraction(double a, double b) {
-		double GCM = GreatestCommonMultiplier(a, b);
+		double GCM = GreatestCommonDivisor(a, b);
 		a = a / GCM;
 		b = b / GCM;
 		if(Math.abs(b)==0){
