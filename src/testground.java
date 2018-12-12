@@ -41,49 +41,12 @@ public class testground {
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {
 
 		/**
-		 * Problem 33: Digit cancelling fractions The fraction 49/98 is a curious
-		 * fraction, as an inexperienced mathematician in attempting to simplify it may
-		 * incorrectly believe that 49/98 = 4/8, which is correct, is obtained by
-		 * cancelling the 9s. We shall consider fractions like, 30/50 = 3/5, to be
-		 * trivial examples. There are exactly four non-trivial examples of this type of
-		 * fraction, less than one in value, and containing two digits in the numerator
-		 * and denominator. If the product of these four fractions is given in its
-		 * lowest common terms, find the value of the denominator.
-		 */
-
-		/**
-		 * Solution decription: Problem pointers: 1. Numerator and denominator both
-		 * contain only 2 digits 2. There exists a total of 4 curious fractions
-		 * 
-		 * Matching conditions for curious fraction: 1. answer1 = cancellation of same
-		 * digit in both numerator and denominator 2. answer2 = simplification of
-		 * fraction 3. answer1 == answer2
-		 * 
-		 * Result 1. To find the product of these 4 fractions, and retrieve value of
-		 * denominator
+		 * Problem 35: Circular primes
 		 */
 
 		// CONFIG
-		double s1 = 2;
-		double s2 = 3;
-
-		List<Fraction> curiousfractions = new ArrayList<Fraction>();
-
-		for (int d = 10; d < 100; d++) {
-			for (int n = 10; n < d; n++) {
-				if (n % 10 != 0 && d % 10 != 0 && n != d) {
-					if (n / 10 == d % 10 || n % 10 == d / 10) {
-						Fraction actual = new Fraction(n, d);
-						Fraction c1 = new Fraction(n / 10, d % 10);
-						Fraction c2 = new Fraction(n % 10, d / 10);
-						if (actual.equals(c1) || actual.equals(c2)) {
-							curiousfractions.add(actual);
-						}
-					}
-				}
-			}
-		}
-
-		System.out.println(curiousfractions);
+		int uppercap = 1000000;
+		
+		
 	}
 }

@@ -1,6 +1,8 @@
 package test_objects;
 
-import java.math.BigInteger;;
+import java.math.BigInteger;
+
+import yifan_toolkit.MathKit;;
 
 public class Fraction {
 
@@ -34,6 +36,16 @@ public class Fraction {
 		Simplify();
 	}
 
+	public Fraction(double i, double n) {
+		
+		i = i * MathKit.DecimalPlaces(Double.toString(i));
+		n = n * MathKit.DecimalPlaces(Double.toString(n));
+		
+		Numerator = new BigInteger(Double.toString(i));
+		Denominator = new BigInteger(Double.toString(n));
+		Simplify();
+	}
+	
 	// Override ToString
 	public String toString() {
 		return Numerator.toString() + "/" + Denominator.toString();

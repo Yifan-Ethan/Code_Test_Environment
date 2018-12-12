@@ -33,6 +33,7 @@ import javax.swing.JFileChooser;
  * Number related functions
  * 1. Generate a random number from a given range (randomnumbergenerator)
  * 2. Generate a random BigInteger within the given range (RandomBigInteger)
+ * 3. Shift most significant digit to least significant dight (RotateDigit)
  * 
  * Data conversion
  * 1. Converts a byte array to hexadecimal (BytesToHex)
@@ -46,6 +47,16 @@ import javax.swing.JFileChooser;
  *
  */
 public class UtilityKit {
+	
+	public static int RotateDigit(int n) {
+		int removefirstdigit = (int) (n%(Math.pow(10, (MathKit.Digits(n)-1))));
+	    int upshift = removefirstdigit*10;
+	    int rotation = (int) (upshift + (n/(Math.pow(10, (MathKit.Digits(n)-1)))));
+	    if(MathKit.Digits(rotation)!=MathKit.Digits(n)) {	//handles 0s in the number. eg. 200314 -> 314200 instead of 3142
+	    	rotation = (int) (rotation*Math.pow(10,MathKit.Digits(n)-MathKit.Digits(rotation)));
+	    }
+	    return rotation;
+	}
 	
 	/**
 	 * Convert any data into byte array

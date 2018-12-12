@@ -7,14 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import test_objects.Fraction;
+
 /**
  * Java scripting tools, catered for mathematics
  * Gentle reminder: Code logic should always be simple and easy to read! No complicated logic is allowed in this class file!
  * This is to ensure that code logic can be easily understood, and easily transferred to a new language
  * This class contains
- * 
- * General Mathematics
- * 1. Fraction of two number (Fraction)
  * 
  * Permuations and combinations
  * 1. Combinations calculator (ncr)
@@ -31,17 +30,16 @@ import java.util.List;
  * Graphs
  * 1. Calculates 2 dimensional Euclidean distance for big integer (BigIntTwoDEuclideanDist)
  * 2. Calculates 2 dimensional Euclidean distance for double (DoubleTwoDEuclideanDist)
- * 3. Formulate the gradient and y-intercept of linear equation based on 2 points on graph for BigInteger (GraphLinearEquationMNCBigInt)
- * 4. Formulate the gradient and y-intercept of linear equation based on 2 points on graph for double (GraphLinearEquationMNCDouble)
- * 5. Calculate the perpendicular distance between an edge represented by 2 points to a certain point. Inputs and outputs are of type Double (PerpendicularDistDouble)
- * 6. Checks if 2 edges cross intersect (IfEdgesCrossIntersect)
- * 7. Checks if 2 edges parallel intersect (IfEdgesParallelIntersect)
+ * 3. Formulate the gradient and y-intercept of linear equation based on 2 points on graph(GraphLinearEquationMNC)
+ * 4. Calculate the perpendicular distance between an edge represented by 2 points to a certain point. Inputs and outputs are of type Double (PerpendicularDistDouble)
+ * 5. Checks if 2 edges cross intersect (IfEdgesCrossIntersect)
+ * 6. Checks if 2 edges parallel intersect (IfEdgesParallelIntersect)
  * 
  * Investigation of a number
  * 1. Checks if number is prime (IsPrime)
  * 2. Finds the largest prime factor of a number (largestprime)
- * 3. Finds the number of decimal places of a number (decimalplaces)
- * 4. Checks the number of digits in a number (digits)
+ * 3. Finds the number of decimal places of a number (DecimalPlaces)
+ * 4. Checks the number of digits in a number (Digits)
  * 5. Finds all factors of a number (AllFactors)
  * 6. Greatest common multiplier of 2 numbers (GreatestCommonDivisor)
  * 
@@ -98,7 +96,7 @@ public class MathKit {
 	    return true;
 	}
 	
-	public int decimalplaces(String n){
+	public static int DecimalPlaces(String n){
 		int decimalplacebegin = 0;
 		boolean check = true;
 		for(int i = n.length()-1; i>-1;i--){
@@ -164,7 +162,7 @@ public class MathKit {
 		return largestprimefactor;
 	}
 	
-	public int digits(double d){
+	public static int Digits(double d){
 		if(d == 0){
 			return 1;
 		}
@@ -248,55 +246,20 @@ public class MathKit {
 		return answer;
 	}
 	
-	//Returns a list where index 0 is gradient of graph, and index 1 is y intercept of graph
-	//Code itself is not as clear as I intended to reduce computation time in solving a problem. Please refer to comments for the meaning of each line
-	//Please note that both gradient m and y-intercept c are arraylists containing the numerator and its denominator. It is to represent a fraction in order to keep accuracy
-	//As such, the returned values cannot be utilised immediately with primitive types such as int. You will have to write another computation separately for them to work together
-	public static List<List<BigInteger>> GraphLinearEquationMNCBigInt(BigInteger ax, BigInteger ay, BigInteger bx, BigInteger by){
-		List<List<BigInteger>> mnc = new ArrayList<List<BigInteger>>();
-		
-		//Calculate fraction for the gradient
-		List<BigInteger> m = new ArrayList<BigInteger>();
-		m.add((ay.subtract(by)));		//This is Y1 - Y2 in gradient calculation
-		m.add(ax.subtract(bx));			//This is X1 - X2 in gradient calculation
-		
-		//Calculate fraction for the y-intercept
-		List<BigInteger> c = new ArrayList<BigInteger>();
-		c.add(((ax.subtract(bx)).multiply(ay)).subtract((ay.subtract(by)).multiply(ax)));	//This is the y-intercept value (c value) in linear equation
-		c.add((ax.subtract(bx)));															//This is X1 - X2 in gradient calculation
-		
-		//Add both gradient and y-intercept to list that will be returned
-		mnc.add(m);
-		mnc.add(c);
+	//mnc.get(0) is gradient, mnc.get(1) is y intercept
+	public static List<Fraction> GraphLinearEquationMNC(BigInteger ax, BigInteger ay, BigInteger bx, BigInteger by){
+		List<Fraction> mnc = new ArrayList<Fraction>();
+		mnc.add(new Fraction(ay.subtract(by),ax.subtract(bx)));	
+		mnc.add(new Fraction(((ax.subtract(bx)).multiply(ay)).subtract((ay.subtract(by)).multiply(ax)),ax.subtract(bx)));										
 		
 		return mnc;
 	}
 	
-	//Returns a list where index 0 is gradient of graph, and index 1 is y intercept of graph
-	//Code itself is not as clear as I intended to reduce computation time in solving a problem. Please refer to comments for the meaning of each line
-	//Please note that both gradient m and y-intercept c are arraylists containing the numerator and its denominator. It is to represent a fraction in order to keep accuracy
-	//As such, the returned values cannot be utilised immediately with primitive types such as int. You will have to write another computation separately for them to work together
-	public static List<List<Double>> GraphLinearEquationMNCDouble(double ax, double ay, double bx, double by){
-		List<List<Double>> mnc = new ArrayList<List<Double>>();
-			
-		//Calculate fraction for the gradient
-		List<Double> m = new ArrayList<Double>();
-		String fraction = Fraction(ay-by,ax-bx);	//Simplifies the fraction
-		String[] dump = fraction.split("/");
-		m.add(Double.parseDouble(dump[0]));		//This is Y1 - Y2 in gradient calculation
-		m.add(Double.parseDouble(dump[1]));		//This is X1 - X2 in gradient calculation
-			
-		//Calculate fraction for the y-intercept
-		List<Double> c = new ArrayList<Double>();
-		fraction = Fraction(((ax-bx)*ay)-((ay-by)*ax),ax-bx);	//Simplifies the fraction
-		dump = fraction.split("/");
-		c.add(Double.parseDouble(dump[0]));		//This is the y-intercept value (c value) in linear equation
-		c.add(Double.parseDouble(dump[1]));		//This is X1 - X2 in gradient calculation
-			
-		//Add both gradient and y-intercept to list that will be returned
-		mnc.add(m);
-		mnc.add(c);
-			
+	//mnc.get(0) is gradient, mnc.get(1) is y intercept
+	public static List<Fraction> GraphLinearEquationMNC(double ax, double ay, double bx, double by){
+		List<Fraction> mnc = new ArrayList<Fraction>();
+		mnc.add(new Fraction(ay-by,ax-bx));	
+		mnc.add(new Fraction(((ax-bx)*ay)-((ay-by)*ax),ax-bx));	
 		return mnc;
 	}
 	
@@ -315,36 +278,36 @@ public class MathKit {
 	 */
 	public static List<String> PerpendicularDistDouble(double ax, double ay, double bx, double by, double px, double py, boolean accuracy){
 		
-		List<List<Double>> mnc = MathKit.GraphLinearEquationMNCDouble(ax, ay, bx, by);
+		List<Fraction> mnc = MathKit.GraphLinearEquationMNC(ax, ay, bx, by);
 
 		//If edge is vertical, and hence has no gradient or y intercept values
-		if(mnc.get(0).get(1)==0){
+		if(mnc.get(0).Denominator.equals(BigInteger.ZERO)){
 			List<String> answer = new ArrayList<String>();
 			answer.add(String.valueOf(Math.abs(ax-px)));
 			return answer;
 		}
 		else{
 			//a is coefficient of x (numerator of gradient for now), b is coefficient of y, and c is y intercept (just the numerator for now)
-			double a = mnc.get(0).get(0);
+			double a = mnc.get(0).Numerator.doubleValue();
 			double b = 1;
-			double c = mnc.get(1).get(0);
+			double c = mnc.get(1).Numerator.doubleValue();
 			
 			//Align sign of a with that of gradient
-			if((a<0 && (mnc.get(0).get(0)/mnc.get(0).get(1))>0) ||
-			   (a>0 && (mnc.get(0).get(0)/mnc.get(0).get(1))<0)	){
+			if((a<0 && (mnc.get(0).Numerator.doubleValue()/mnc.get(0).Denominator.doubleValue())>0) ||
+			   (a>0 && (mnc.get(0).Numerator.doubleValue()/mnc.get(0).Denominator.doubleValue())<0)	){
 				a = -a;
 			}
 			
 			//Align sign of c with that of y intercept
-			if((c<0 && (mnc.get(1).get(0)/mnc.get(1).get(1))>0) ||
-			   (c>0 && (mnc.get(1).get(0)/mnc.get(1).get(1))<0)	){
+			if((c<0 && (mnc.get(1).Numerator.doubleValue()/mnc.get(1).Denominator.doubleValue())>0) ||
+			   (c>0 && (mnc.get(1).Numerator.doubleValue()/mnc.get(1).Denominator.doubleValue())<0)	){
 				c = -c;
 			}
 			
 			//Multiply each coefficient by all available denominators to eliminate fractions
-			a = a*Math.abs(mnc.get(1).get(1));
-			b = b*Math.abs(mnc.get(1).get(1))*Math.abs(mnc.get(0).get(1));
-			c = c*Math.abs(mnc.get(0).get(1));
+			a = a*Math.abs(mnc.get(1).Denominator.doubleValue());
+			b = b*Math.abs(mnc.get(1).Denominator.doubleValue())*Math.abs(mnc.get(0).Denominator.doubleValue());
+			c = c*Math.abs(mnc.get(0).Denominator.doubleValue());
 			
 			//Bring x and c to the side of y so equation becomes AX+BY+C=0
 			a = -a;
@@ -490,22 +453,6 @@ public class MathKit {
 	}
 	
 	/**
-	 * Provides and simplifies the fraction of 2 numbers
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	public static String Fraction(double a, double b) {
-		double GCM = GreatestCommonDivisor(a, b);
-		a = a / GCM;
-		b = b / GCM;
-		if(Math.abs(b)==0){
-			b = 0;
-		}
-	    return a + "/" + b;
-	}
-	
-	/**
 	 * This function checks if 2 edges intersect by running along one another. Note that intersect is NOT counted if edge 1 touches edge 2 with its tip only.
 	 * e1 stands for edge 1, and e2 stands for edge 2
 	 * Inputs are start and end points of both edges, with x and y representing their coordinates
@@ -520,17 +467,15 @@ public class MathKit {
 	 * @return
 	 */
 	public static boolean IfEdgesParallelIntersect(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
-		List<List<Double>> e1MNC = MathKit.GraphLinearEquationMNCDouble(e1x1, e1y1, e1x2, e1y2);
-		List<List<Double>> e2MNC = MathKit.GraphLinearEquationMNCDouble(e2x1, e2y1, e2x2, e2y2);
+		List<Fraction> e1MNC = MathKit.GraphLinearEquationMNC(e1x1, e1y1, e1x2, e1y2);
+		List<Fraction> e2MNC = MathKit.GraphLinearEquationMNC(e2x1, e2y1, e2x2, e2y2);
 		
 		//If both edges have the same linear equation
 		if(
-		   (e1MNC.get(0).get(0).equals(e2MNC.get(0).get(0))) &&
-		   (e1MNC.get(0).get(1).equals(e2MNC.get(0).get(1))) &&
-		   (e1MNC.get(1).get(0).equals(e2MNC.get(1).get(0))) &&
-		   (e1MNC.get(1).get(1).equals(e2MNC.get(1).get(1)))
+		   (e1MNC.get(0).equals(e2MNC.get(0))) &&
+		   (e1MNC.get(1).equals(e2MNC.get(1)))
 		  ){
-			//If one point of either edge lies between (both vertically and horizontally) both points on the other edge
+			//If start/end point of one edge lies on other edge (an edge is a non continuous, straight line)
 			if(
 			    (
 				(((e2x1<e1x1) && (e1x1<e2x2)) && ((e2y1<e1y1) && (e1y1<e2y2))) ||
@@ -566,14 +511,11 @@ public class MathKit {
 	 * @return
 	 */
 	public static boolean IfEdgesCrossIntersect(double e1x1, double e1y1, double e1x2, double e1y2, double e2x1, double e2y1, double e2x2, double e2y2){
-		List<List<Double>> e1MNC = MathKit.GraphLinearEquationMNCDouble(e1x1, e1y1, e1x2, e1y2);
-		List<List<Double>> e2MNC = MathKit.GraphLinearEquationMNCDouble(e2x1, e2y1, e2x2, e2y2);
+		List<Fraction> e1MNC = MathKit.GraphLinearEquationMNC(e1x1, e1y1, e1x2, e1y2);
+		List<Fraction> e2MNC = MathKit.GraphLinearEquationMNC(e2x1, e2y1, e2x2, e2y2);
 
 		//If edges are parallel
-		if(
-		   (e1MNC.get(0).get(0).equals(e2MNC.get(0).get(0))) &&
-		   (e1MNC.get(0).get(1).equals(e2MNC.get(0).get(1)))
-		   ){
+		if(e1MNC.get(0).equals(e2MNC.get(0))){
 			return false;
 		}
 		else{
@@ -582,10 +524,10 @@ public class MathKit {
 			double y = 0;
 			
 			//If edge 1 is vertical but edge 2 is not
-			if((e1MNC.get(1).get(1) == 0) && (e2MNC.get(1).get(1) != 0)){
+			if((e1MNC.get(1).Denominator.doubleValue() == 0) && (e2MNC.get(1).Denominator.doubleValue() != 0)){
 				x = e1x1;
-				double e2m = e2MNC.get(0).get(0)/e2MNC.get(0).get(1);
-				double e2c = (e2MNC.get(1).get(0)/e2MNC.get(1).get(1));
+				double e2m = e2MNC.get(0).Numerator.doubleValue()/e2MNC.get(0).Denominator.doubleValue();
+				double e2c = (e2MNC.get(1).Numerator.doubleValue()/e2MNC.get(1).Denominator.doubleValue());
 				y = (e2m*x)+e2c;
 				//Checks if intersection of 2 edges lies on both edges
 				if(
@@ -598,10 +540,10 @@ public class MathKit {
 				}
 			}
 			//If edge 2 is vertical but edge 1 is not
-			else if((e2MNC.get(1).get(1) == 0) && (e1MNC.get(1).get(1) != 0)){
+			else if((e2MNC.get(1).Denominator.doubleValue() == 0) && (e1MNC.get(1).Denominator.doubleValue() != 0)){
 				x = e2x1;
-				double e1m = e1MNC.get(0).get(0)/e1MNC.get(0).get(1);
-				double e1c = (e1MNC.get(1).get(0)/e1MNC.get(1).get(1));
+				double e1m = e1MNC.get(0).Numerator.doubleValue()/e1MNC.get(0).Denominator.doubleValue();
+				double e1c = (e1MNC.get(1).Numerator.doubleValue()/e1MNC.get(1).Denominator.doubleValue());
 				y = (e1m*x)+e1c;
 				//Checks if intersection of 2 edges lies on both edges
 				if(
@@ -615,17 +557,17 @@ public class MathKit {
 			}
 			//If none of the 2 edges are vertical
 			else{
-				double e2c = (e2MNC.get(1).get(0)/e2MNC.get(1).get(1));
-				double e1c = (e1MNC.get(1).get(0)/e1MNC.get(1).get(1));
+				double e2c = (e2MNC.get(1).Numerator.doubleValue()/e2MNC.get(1).Denominator.doubleValue());
+				double e1c = (e1MNC.get(1).Numerator.doubleValue()/e1MNC.get(1).Denominator.doubleValue());
 				double xnum = e2c-e1c;
-				double e1m = e1MNC.get(0).get(0)/e1MNC.get(0).get(1);
-				double e2m = e2MNC.get(0).get(0)/e2MNC.get(0).get(1);
+				double e1m = e1MNC.get(0).Numerator.doubleValue()/e1MNC.get(0).Denominator.doubleValue();
+				double e2m = e2MNC.get(0).Numerator.doubleValue()/e2MNC.get(0).Denominator.doubleValue();
 				double xdenom = e1m-e2m;
 				x = xnum/xdenom;
 				y = (e1m*x)+e1c;
 
 				//If edge 1 is horizontal
-				if(e1MNC.get(0).get(0) == 0){
+				if(e1MNC.get(0).Numerator.doubleValue() == 0){
 					if(
 					   (((e1x1<x) && (x<e1x2)) || ((e1x1>x)&&(x>e1x2))) &&
 					   (((e1y1<=y) && (y<=e1y2)) || ((e1y1>=y)&&(y>=e1y2))) &&
@@ -636,7 +578,7 @@ public class MathKit {
 					}
 				}
 				//If edge 2 is horizontal
-				else if(e2MNC.get(0).get(0) == 0){
+				else if(e2MNC.get(0).Numerator.doubleValue() == 0){
 					if(
 					   (((e1x1<x) && (x<e1x2)) || ((e1x1>x)&&(x>e1x2))) &&
 					   (((e1y1<y) && (y<e1y2)) || ((e1y1>y)&&(y>e1y2))) &&
