@@ -42,6 +42,8 @@ import test_objects.Fraction;
  * 4. Checks the number of digits in a number (Digits)
  * 5. Finds all factors of a number (AllFactors)
  * 6. Greatest common multiplier of 2 numbers (GreatestCommonDivisor)
+ * 7. Find smallest factor of a number (SmallestFactor)
+ * 8. Lists only distinct, non composite factors of a number (DistinctFactors)
  * 
  * Calculation for scientific purposes
  * 1. Cantor pairing function, uniquely encode 2 natural numbers into a single natural number (pairingfunction)
@@ -94,6 +96,26 @@ public class MathKit {
 	    	i = i.add(new BigInteger("2"));
 	    }
 	    return true;
+	}
+	
+	public static BigInteger SmallestFactor(BigInteger n) {
+		//Return false if n is less than 1
+		if(n.compareTo(BigInteger.ONE)==-1){
+			return new BigInteger("-1");
+		}
+	    //check if n is a multiple of 2, and also not equals to 2
+	    if (n.mod(new BigInteger("2")).equals(new BigInteger("0")) && !n.equals(new BigInteger("2"))) {
+	    	return new BigInteger("2");
+	    }
+	    //if not, then just check the odds	    
+	    BigInteger i = new BigInteger("3");
+	    while(i.multiply(i).compareTo(n) == -1 || i.multiply(i).compareTo(n) == 0){
+	    	if(n.mod(i).equals(new BigInteger("0"))){
+	    		return i;
+	    	}
+	    	i = i.add(new BigInteger("2"));
+	    }
+	    return new BigInteger("-1");
 	}
 	
 	public static int DecimalPlaces(String n){
@@ -384,6 +406,36 @@ public class MathKit {
 		return AllPartitions.get(AllPartitions.size()-1);		//Returns the value of P(n)
 	}
 	
+	public static List<BigInteger> DistinctFactors(BigInteger input){
+		
+		List<BigInteger> factors = new ArrayList<BigInteger>();
+		
+		BigInteger big_two = BigInteger.valueOf(2);
+		
+		if(input.remainder(BigInteger.valueOf(2)).equals(BigInteger.ZERO)) {
+			factors.add(BigInteger.valueOf(2));
+			input = input.divide(big_two);
+			while(input.remainder(big_two).equals(BigInteger.ZERO) && !input.equals(BigInteger.ONE)) {
+				input = input.divide(big_two);
+			}
+		}
+		
+		BigInteger big_divisor = BigInteger.valueOf(3);
+		
+		while(!input.equals(BigInteger.ONE)) {
+			if(MathKit.IsPrime(big_divisor) && (input.remainder(big_divisor)).equals(BigInteger.ZERO)) {
+				input = input.divide(big_divisor);
+				factors.add(big_divisor);
+				while(input.remainder(big_divisor).equals(BigInteger.ZERO) && !input.equals(BigInteger.ONE)) {
+					input = input.divide(big_divisor);
+				}
+			}
+			big_divisor = big_divisor.add(big_two);
+		}
+		
+		return factors;
+	}
+	
 	/**
 	 * Logic of this code is as follows:
 	 * 1. Finds all possible number of base divisors (etc 2s and 3s) while breaking down number by said divisors (divide and conquer)
@@ -450,6 +502,16 @@ public class MathKit {
 	 */
 	public static double GreatestCommonDivisor(double a, double b) {
 	    return b == 0 ? a : GreatestCommonDivisor(b, a % b); 
+	}
+	
+	/**
+	 * Returns the greatest common multiplier of 2 numbers a and b
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static BigInteger GreatestCommonDivisor(BigInteger a, BigInteger b) {
+	    return b.equals(BigInteger.ZERO) ? a : GreatestCommonDivisor(b, a.mod(b)); 
 	}
 	
 	/**

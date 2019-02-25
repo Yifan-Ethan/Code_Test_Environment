@@ -40,13 +40,21 @@ public class testground {
 
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException {
 
-		/**
-		 * Problem 35: Circular primes
-		 */
-
 		// CONFIG
-		int uppercap = 1000000;
+		int count = 4;
 		
-		
+		for(int i=1;i<1000000;i++) {
+			if(MathKit.DistinctFactors(BigInteger.valueOf(i)).size()==count) {
+				for(int c=1;c<=count-1;c++) {
+					if(MathKit.DistinctFactors(BigInteger.valueOf(i+c)).size()!=count) {
+						c = count+1;
+					}
+					if(c==count-1) {
+						System.out.println(i);
+						i = 1000000;
+					}
+				}
+			}
+		}
 	}
 }
